@@ -51,7 +51,7 @@ function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: a
 
 export default function DeveloperSettings() {
   const router = useRouter();
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
