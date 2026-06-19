@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Loader2, Save } from 'lucide-react';
 
-function SettingsForm({ settings, onChange }) {
-  const handleInput = (e) => {
+function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: any) => void }) {
+  const handleInput = (e: any) => {
     const { name, value, type, checked } = e.target;
     onChange({ ...settings, [name]: type === 'checkbox' ? checked : value });
   };
