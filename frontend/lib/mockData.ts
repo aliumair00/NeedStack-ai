@@ -3,6 +3,7 @@ export type ClaimStatus = 'unclaimed' | 'in_progress' | 'solved'
 
 export interface UserProblem {
   id: string
+  clusterId?: string
   text: string
   category: ProblemCategory
   similarCount: number
