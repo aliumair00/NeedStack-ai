@@ -1,0 +1,2 @@
+Status: 201
+Response: {"message":"Registration successful"}
