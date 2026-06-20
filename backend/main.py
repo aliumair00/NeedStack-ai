@@ -17,9 +17,9 @@ load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # await connect_to_mongo()
+    await connect_to_mongo()
     yield
-    # await close_mongo_connection()
+    await close_mongo_connection()
 
 app = FastAPI(title="Needstack AI Backend", lifespan=lifespan)
 
