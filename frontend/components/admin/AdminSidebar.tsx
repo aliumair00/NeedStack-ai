@@ -11,9 +11,11 @@ import {
 interface AdminSidebarProps {
   pendingApprovals: number
   totalUsers: number
+  mobileOpen?: boolean
+  onClose?: () => void
 }
 
-export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSidebarProps) {
+export default function AdminSidebar({ pendingApprovals, totalUsers, mobileOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
 
   const handleLogout = async () => {
@@ -34,7 +36,7 @@ export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSide
       href: '/admin/dashboard?tab=users',
       icon: <Users size={15} />,
       badge: totalUsers,
-      badgeStyle: 'bg-white/[0.07] text-slate-500',
+      badgeStyle: 'bg-white/10 text-slate-500',
     },
     {
       label: 'Developers',
@@ -48,8 +50,20 @@ export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSide
   ]
 
   return (
-    <aside className="w-[200px] shrink-0 bg-[#0D0D15] border-r border-white/[0.06] flex flex-col">
-      <div className="flex items-center gap-2 px-5 py-5 border-b border-white/[0.05]">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          onClick={onClose}
+        />
+      )}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-[200px] bg-[#0D0D15] border-r border-white/5 flex flex-col shrink-0
+        transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+      <div className="flex items-center gap-2 px-5 py-5 border-b border-white/5">
         <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_6px_#6366F1]" />
         <span className="text-white font-semibold text-sm tracking-tight">Needstack AI</span>
       </div>
@@ -61,10 +75,11 @@ export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSide
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all ${
                 isActive
                   ? 'bg-indigo-500/10 text-indigo-400'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
               }`}
             >
               <span className="shrink-0">{item.icon}</span>
@@ -78,19 +93,20 @@ export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSide
           )
         })}
 
-        <div className="h-px bg-white/[0.05] my-3" />
+        <div className="h-px bg-white/5 my-3" />
 
         <Link
           href="/admin/settings"
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:bg-white/[0.04] transition-all"
+          onClick={onClose}
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all"
         >
           <Settings size={15} />
           Settings
         </Link>
       </nav>
 
-      <div className="p-3 border-t border-white/[0.05]">
-        <div className="bg-indigo-500/[0.08] border border-indigo-500/20 rounded-lg px-3 py-2.5 mb-2">
+      <div className="p-3 border-t border-white/5">
+        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-3 py-2.5 mb-2">
           <div className="flex items-center gap-2">
             <Shield size={13} className="text-indigo-400 shrink-0" />
             <div>
@@ -108,5 +124,6 @@ export default function AdminSidebar({ pendingApprovals, totalUsers }: AdminSide
         </button>
       </div>
     </aside>
+    </>
   )
 }

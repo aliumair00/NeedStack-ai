@@ -1,7 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, Literal
 from datetime import datetime
 from .base import MongoBaseModel
+from utils.validators import SafeStr
 
 class ClaimModel(MongoBaseModel):
     developer_id: str
@@ -12,7 +13,11 @@ class ClaimModel(MongoBaseModel):
     updated_at: datetime
 
 class ClaimProgressUpdate(BaseModel):
-    status: str
+    model_config = ConfigDict(extra="forbid")
+    
+    status: Literal["in_progress", "testing", "solved"]
     
 class ClaimRequest(BaseModel):
-    note: Optional[str] = None
+    model_config = ConfigDict(extra="forbid")
+    
+    note: Optional[SafeStr] = Field(default=None, max_length=300)

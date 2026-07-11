@@ -23,7 +23,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setLocalConvs(conversations)
+    setTimeout(() => setLocalConvs(conversations), 0)
   }, [conversations])
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
           messages: []
         }
       }
-      setActiveConv(conv)
+      setTimeout(() => setActiveConv(conv), 0)
     }
   }, [initialConvId, open, localConvs])
 
@@ -55,21 +55,24 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
       const fetchMessages = async () => {
         try {
           const [clusterId, otherUserId] = activeConv.id.split('_')
-          const msgs = await api.get<any[]>(`/api/messages/${clusterId}/${otherUserId}`)
-          setActiveConv((prev) => {
-            if (!prev || prev.id !== activeConv.id) return prev
-            return {
-              ...prev,
-              messages: msgs.map((m: any) => ({
-                id: m.id,
-                content: m.content,
-                time: m.time,
-                isMe: m.is_me,
-                senderAvatar: m.is_me ? 'AR' : prev.userAvatar,
-              })),
-            }
-          })
-        } catch (err) {
+          const msgs = await api.get<{ id: string, sender_id: string, content: string, time: string, is_me: boolean }[]>(`/api/messages/${clusterId}/${otherUserId}`)
+          
+          if (activeConv) {
+            setActiveConv((prev) => {
+              if (!prev) return null
+              return {
+                ...prev,
+                messages: msgs.map((m) => ({
+                  id: m.id,
+                  content: m.content,
+                  time: m.time,
+                  isMe: m.is_me,
+                  senderAvatar: m.is_me ? 'AR' : prev.userAvatar,
+                })),
+              }
+            })
+          }
+        } catch (err: unknown) {
           console.error('Failed to fetch messages:', err)
         }
       }
@@ -79,49 +82,81 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
 
   const sendMessage = async () => {
     if (!message.trim() || !activeConv) return
+    
+    const contentToSend = message.trim();
+    setMessage(''); // Clear input immediately for instant feedback
+    
+    // Auto-reset textarea height if it was expanded
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(t => t.style.height = '32px');
+
     const [clusterId, otherUserId] = activeConv.id.split('_')
+    
+    // Create optimistic message
+    const tempId = 'temp_' + Date.now();
+    const optimisticMsg: DevMessage = {
+      id: tempId,
+      content: contentToSend,
+      time: 'Sending...',
+      isMe: true,
+      senderAvatar: 'AR',
+    }
+
+    setActiveConv((prev) => {
+      if (!prev) return null
+      return {
+        ...prev,
+        messages: [...(prev.messages || []), optimisticMsg],
+      }
+    })
+
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 50)
 
     try {
-      const sentMsg = await api.post<any>('/api/messages', {
+      const sentMsg = await api.post<{ id: string, time: string }>('/api/messages', {
         receiver_id: otherUserId,
         cluster_id: clusterId,
-        content: message.trim(),
+        content: contentToSend,
       })
 
-      const newMsg: DevMessage = {
-        id: sentMsg.id,
-        content: sentMsg.content,
-        time: sentMsg.time,
-        isMe: true,
-        senderAvatar: 'AR',
-      }
-
+      // Replace optimistic message with real message
       setActiveConv((prev) => {
         if (!prev) return null
         return {
           ...prev,
-          messages: [...(prev.messages || []), newMsg],
+          messages: prev.messages.map(m => m.id === tempId ? {
+            ...m,
+            id: sentMsg.id,
+            time: sentMsg.time
+          } : m),
         }
       })
 
       setLocalConvs((prev) =>
         prev.map((c) =>
           c.id === activeConv.id
-            ? { ...c, lastMessage: newMsg.content, lastTime: 'Just now', unreadCount: 0 }
+            ? { ...c, lastMessage: contentToSend, lastTime: 'Just now', unreadCount: 0 }
             : c
         )
       )
-      setMessage('')
 
-      // Notify parent that a message was sent (e.g., to update conversation list)
       if (onMessageSent) onMessageSent(activeConv.id)
 
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 50)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to send message:', err)
-      const messageText = err?.message || 'Unable to send message. Please try again.'
+      
+      // Remove optimistic message if failed
+      setActiveConv((prev) => {
+        if (!prev) return null
+        return {
+          ...prev,
+          messages: prev.messages.filter(m => m.id !== tempId),
+        }
+      })
+      
+      const messageText = err instanceof Error ? err.message : String(err) || 'Unable to send message. Please try again.'
       if (messageText.includes('Could not validate credentials') || messageText.includes('Not authenticated')) {
         alert('Session expired or not authenticated. Please log in again.')
         localStorage.clear()
@@ -139,10 +174,10 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
   return (
     <>
       <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-[380px] bg-[#0D0D15] border-l border-white/[0.08] z-50 flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full sm:w-[380px] bg-[#0D0D15] border-l border-white/10 z-50 flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-white/5">
           {activeConv && (
             <button onClick={() => setActiveConv(null)} className="text-slate-500 hover:text-slate-300 transition-colors">
               <ArrowLeft size={16} />
@@ -165,7 +200,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
 
         {/* Conversation list */}
         {!activeConv && (
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
             {localConvs.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-6">
                 <p className="text-sm text-slate-500 mb-1">No messages yet</p>
@@ -176,7 +211,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
                 <button
                   key={conv.id}
                   onClick={() => setActiveConv(conv)}
-                  className="w-full flex items-start gap-3 px-4 py-3.5 border-b border-white/[0.04] hover:bg-white/[0.03] transition-colors text-left"
+                  className="w-full flex items-start gap-3 px-4 py-3.5 border-b border-white/5 hover:bg-white/5 transition-colors text-left"
                 >
                   <div className="w-9 h-9 rounded-full bg-cyan-500/15 flex items-center justify-center text-xs font-semibold text-cyan-300 shrink-0">
                     {conv.userAvatar}
@@ -203,7 +238,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
         {/* Chat thread */}
         {activeConv && (
           <>
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-hide">
               {activeConv.messages.map((msg) => (
                 <div key={msg.id} className={`flex items-end gap-2 ${msg.isMe ? 'flex-row-reverse' : ''}`}>
                   {!msg.isMe && (
@@ -215,7 +250,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
                     className={`max-w-[75%] px-3 py-2 rounded-xl text-xs leading-relaxed ${
                       msg.isMe
                         ? 'bg-indigo-600 text-white rounded-br-sm'
-                        : 'bg-white/[0.06] text-slate-200 rounded-bl-sm'
+                        : 'bg-white/5 text-slate-200 rounded-bl-sm'
                     }`}
                   >
                     {msg.content}
@@ -228,24 +263,43 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="px-4 py-3 border-t border-white/[0.06]">
-              <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                  placeholder="Message user..."
-                  className="flex-1 bg-transparent text-xs text-white placeholder:text-slate-600 outline-none"
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!message.trim()}
-                  className="text-indigo-400 hover:text-indigo-300 disabled:text-slate-700 transition-colors"
-                  aria-label="Send"
-                >
-                  <Send size={14} />
-                </button>
+            {/* Premium Message Input */}
+            <div className="px-4 py-4 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F] to-transparent z-10 pt-8 pb-6">
+              <div className="relative group">
+                {/* Glow effect */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-[24px] blur opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
+                
+                <div className="relative flex items-end gap-2 bg-[#12121A] border border-white/10 focus-within:border-indigo-500/50 rounded-[24px] px-4 py-2.5 transition-all shadow-lg">
+                  <textarea
+                    value={message}
+                    onChange={(e) => {
+                      setMessage(e.target.value);
+                      e.target.style.height = 'auto';
+                      e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                    }}
+                    onKeyDown={(e) => { 
+                      if (e.key === 'Enter' && !e.shiftKey) { 
+                        e.preventDefault(); 
+                        sendMessage() 
+                      } 
+                    }}
+                    placeholder="Message user..."
+                    rows={1}
+                    className="flex-1 bg-transparent text-[14px] text-white placeholder:text-slate-500 outline-none resize-none py-1.5 min-h-[32px] max-h-[120px] scrollbar-hide leading-relaxed"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!message.trim()}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 mb-0.5 ${
+                      message.trim() 
+                        ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95' 
+                        : 'bg-white/5 text-slate-500'
+                    }`}
+                    aria-label="Send message"
+                  >
+                    <Send size={15} className={message.trim() ? "translate-x-[-1px] translate-y-[1px]" : ""} />
+                  </button>
+                </div>
               </div>
             </div>
           </>

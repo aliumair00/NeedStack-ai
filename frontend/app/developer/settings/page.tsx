@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Loader2, Save } from 'lucide-react';
 
-function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: any) => void }) {
-  const handleInput = (e: any) => {
+function SettingsForm({ settings, onChange }: { settings: Record<string, string | boolean>, onChange: (val: Record<string, string | boolean>) => void }) {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     onChange({ ...settings, [name]: type === 'checkbox' ? checked : value });
   };
@@ -19,9 +19,9 @@ function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: a
           <input
             name="full_name"
             type="text"
-            value={settings.full_name || ''}
+            value={typeof settings.full_name === 'string' ? settings.full_name : ''}
             onChange={handleInput}
-            className="mt-1 bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white placeholder:text-slate-600 focus:outline-none"
+            className="mt-1 bg-white/5 border border-white/10 rounded-lg p-2 text-white placeholder:text-slate-600 focus:outline-none"
           />
         </label>
         <label className="flex flex-col text-sm text-slate-400">
@@ -29,9 +29,9 @@ function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: a
           <input
             name="email"
             type="email"
-            value={settings.email || ''}
+            value={typeof settings.email === 'string' ? settings.email : ''}
             onChange={handleInput}
-            className="mt-1 bg-white/[0.04] border border-white/[0.08] rounded-lg p-2 text-white placeholder:text-slate-600 focus:outline-none"
+            className="mt-1 bg-white/5 border border-white/10 rounded-lg p-2 text-white placeholder:text-slate-600 focus:outline-none"
           />
         </label>
       </div>
@@ -39,9 +39,9 @@ function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: a
         <input
           name="notifications"
           type="checkbox"
-          checked={settings.notifications ?? false}
+          checked={Boolean(settings.notifications)}
           onChange={handleInput}
-          className="h-4 w-4 rounded border-white/[0.2] bg-white/[0.04] text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500"
         />
         <span>Enable email notifications</span>
       </label>
@@ -51,7 +51,7 @@ function SettingsForm({ settings, onChange }: { settings: any, onChange: (val: a
 
 export default function DeveloperSettings() {
   const router = useRouter();
-  const [settings, setSettings] = useState<any>({});
+  const [settings, setSettings] = useState<Record<string, string | boolean>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -62,7 +62,7 @@ export default function DeveloperSettings() {
       router.push('/login');
     } else {
       api
-        .get('/api/settings')
+        .get<Record<string, string | boolean>>('/api/settings')
         .then((data) => setSettings(data))
         .catch((err) => console.error('Failed to load settings', err))
         .finally(() => setLoading(false));

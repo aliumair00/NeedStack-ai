@@ -40,7 +40,7 @@ export default function NotificationsDropdown({ notifications, onMarkAllRead }: 
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] transition-all"
+        className="relative w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-white/10 transition-all"
         aria-label="Notifications"
       >
         <Bell size={15} />
@@ -52,8 +52,8 @@ export default function NotificationsDropdown({ notifications, onMarkAllRead }: 
       </button>
 
       {open && (
-        <div className="absolute right-0 top-10 w-80 bg-[#111118] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="absolute right-0 top-10 w-80 bg-[#111118] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
             <span className="text-sm font-medium text-white">Notifications</span>
             {unreadCount > 0 && (
               <button
@@ -73,7 +73,7 @@ export default function NotificationsDropdown({ notifications, onMarkAllRead }: 
               notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className={`flex items-start gap-3 px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.03] transition-colors cursor-pointer ${!notif.isRead ? 'bg-white/[0.02]' : ''}`}
+                  className={`flex items-start gap-3 px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${!notif.isRead ? 'bg-white/5' : ''}`}
                 >
                   <div className={`w-6 h-6 rounded-full ${NOTIF_BG[notif.type]} flex items-center justify-center shrink-0 mt-0.5`}>
                     {NOTIF_ICONS[notif.type]}

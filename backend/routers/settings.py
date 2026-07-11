@@ -1,21 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 from typing import Optional
 from bson import ObjectId
 
 from database.connection import get_database
 from middleware.auth_middleware import get_current_user
+from utils.validators import SafeStr
 
 router = APIRouter(prefix="/api", tags=["settings"])
 
 class SettingsUpdate(BaseModel):
-    full_name: Optional[str] = None
-    email: Optional[str] = None
+    model_config = ConfigDict(extra="forbid")
+    
+    full_name: Optional[SafeStr] = Field(default=None, min_length=2, max_length=50, pattern=r"^[A-Za-z\s\-\.]+$")
+    email: Optional[EmailStr] = None
     notifications: Optional[bool] = None
 
 @router.get("/settings", response_model=dict)
 async def get_settings(current_user: dict = Depends(get_current_user)):
-    # Return a subset of user fields
+   
     return {
         "full_name": current_user.get("full_name"),
         "email": current_user.get("email"),

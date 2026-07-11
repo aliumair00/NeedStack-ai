@@ -34,11 +34,13 @@ export default function AdminSettingsPage() {
     if (auth !== 'true' || role !== 'admin') {
       router.push('/login')
     } else {
-      setIsAuthenticated(true)
-      if (email) setAdminEmail(email)
+      setTimeout(() => {
+        setIsAuthenticated(true)
+        if (email) setAdminEmail(email)
+      }, 0)
       
       // Fetch sidebar stats
-      api.get<any>('/api/admin/stats')
+      api.get<Record<string, number>>('/api/admin/stats')
         .then(data => {
           setTotalUsers(data.totalUsers || 0)
           setPendingApprovals(data.pendingApprovals || 0)
@@ -76,7 +78,7 @@ export default function AdminSettingsPage() {
 
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div>
             <h1 className="text-lg font-semibold text-white">Platform Settings</h1>
             <p className="text-xs text-slate-500 mt-0.5">Manage global platform configurations and admin security</p>
@@ -87,8 +89,8 @@ export default function AdminSettingsPage() {
           <div className="max-w-3xl mx-auto space-y-8">
             
             {/* Platform Config */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
                   <Globe size={16} />
                 </div>
@@ -104,7 +106,7 @@ export default function AdminSettingsPage() {
                     type="text" 
                     value={siteName}
                     onChange={(e) => setSiteName(e.target.value)}
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   />
                 </div>
                 <div>
@@ -113,15 +115,15 @@ export default function AdminSettingsPage() {
                     type="email" 
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   />
                 </div>
               </div>
             </section>
 
             {/* Platform Controls */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
                   <Sliders size={16} />
                 </div>
@@ -144,7 +146,7 @@ export default function AdminSettingsPage() {
                   </button>
                 </div>
                 
-                <div className="h-px bg-white/[0.05] w-full my-4" />
+                <div className="h-px bg-white/5 w-full my-4" />
                 
                 <div className="flex items-center justify-between">
                   <div>
@@ -162,8 +164,8 @@ export default function AdminSettingsPage() {
             </section>
 
             {/* Security Section */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
                   <Shield size={16} />
                 </div>
@@ -180,7 +182,7 @@ export default function AdminSettingsPage() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
                   />
                 </div>
                 <div>
@@ -190,14 +192,14 @@ export default function AdminSettingsPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min 8 characters"
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
                   />
                 </div>
               </div>
             </section>
 
             {/* Save Actions */}
-            <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/5">
               {saveSuccess && (
                 <div className="flex items-center gap-2 text-emerald-400 text-sm">
                   <CheckCircle2 size={16} />

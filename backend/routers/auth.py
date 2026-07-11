@@ -53,10 +53,14 @@ async def register(user: UserCreate):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(user_login: UserLogin):
-    # Check for hardcoded admin from .env first
     admin_email = os.getenv("ADMIN_EMAIL")
     admin_password = os.getenv("ADMIN_PASSWORD")
-    if admin_email and admin_password and user_login.email == admin_email and user_login.password == admin_password:
+    
+    # Strip any accidental whitespace from the frontend
+    req_email = user_login.email.strip()
+    req_password = user_login.password.strip()
+    
+    if admin_email and admin_password and req_email == admin_email.strip() and req_password == admin_password.strip():
         token_payload = {"user_id": "admin", "role": "admin"}
         return {
             "access_token": create_access_token(subject=token_payload),
@@ -67,9 +71,9 @@ async def login(user_login: UserLogin):
         }
         
     db = get_database()
-    user = await db.users.find_one({"email": user_login.email})
+    user = await db.users.find_one({"email": req_email})
     
-    if not user or not verify_password(user_login.password, user["password_hash"]):
+    if not user or not verify_password(req_password, user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials or server connection failed."

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  MessageSquare, CheckCircle, Clock, TrendingUp,
-  ChevronDown, ChevronUp, AlertCircle, Loader2,
+import { 
+  Flame, Clock, TrendingUp, CheckCircle, 
+  MessageSquare, Loader2, Menu,
+  ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react'
 import UserSidebar from '@/components/user/UserSidebar'
 import NotificationsDropdown from '@/components/shared/NotificationsDropdown'
@@ -36,6 +37,7 @@ function UserDashboardContent() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [chatOpen, setChatOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeChatConvId, setActiveChatConvId] = useState<string | null>(null)
   const [expandedProblem, setExpandedProblem] = useState<string | null>(null)
 
@@ -62,13 +64,13 @@ function UserDashboardContent() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const myProbs = await api.get<any[]>('/api/problems/my-problems')
-      setProblems(myProbs)
+      const myProbs = await api.get<unknown[]>('/api/problems/my-problems')
+      setProblems(myProbs as import('@/lib/mockData').UserProblem[])
 
-      const notifs = await api.get<any[]>('/api/notifications')
-      setNotifications(notifs.map((n: any) => ({
+      const notifs = await api.get<{ id: string, type: string, message: string, time: string, is_read: boolean, problem_id: string, cluster_id: string }[]>('/api/notifications')
+      setNotifications(notifs.map((n) => ({
         id: n.id,
-        type: n.type,
+        type: n.type as 'solved' | 'claim' | 'similar' | 'message',
         message: n.message,
         time: n.time,
         isRead: n.is_read,
@@ -76,8 +78,8 @@ function UserDashboardContent() {
         clusterId: n.cluster_id
       })))
 
-      const convs = await api.get<any[]>('/api/messages/conversations')
-      setConversations(convs.map((c: any) => ({
+      const convs = await api.get<{ conversation_id: string, other_user_name: string, other_user_avatar: string, problem_title: string, last_message: string, last_time: string, unread_count: number }[]>('/api/messages/conversations')
+      setConversations(convs.map((c) => ({
         id: c.conversation_id,
         developerName: c.other_user_name,
         developerAvatar: c.other_user_avatar,
@@ -101,14 +103,16 @@ function UserDashboardContent() {
   if (auth !== 'true' || role !== 'user') {
     router.push('/login')
   } else {
-    setIsAuthenticated(true)
-    if (email) {
+    setTimeout(() => {
+      setIsAuthenticated(true)
+      if (email) {
       setUserEmail(email)
       const prefix = email.split('@')[0]
       const formattedName = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace('.', ' ')
       setUserName(formattedName || 'Ali Hassan')
     }
-    fetchDashboardData()
+      fetchDashboardData()
+    }, 0)
   }
 }, [router, fetchDashboardData]);
 
@@ -121,7 +125,7 @@ useEffect(() => {
   // Sync tab=messages to open chat panel automatically
   useEffect(() => {
     if (currentTab === 'messages') {
-      setChatOpen(true)
+      setTimeout(() => setChatOpen(true), 0)
     }
   }, [currentTab])
 
@@ -146,8 +150,8 @@ useEffect(() => {
       setSubmitState(result.isNewCluster ? 'new' : 'matched')
 
       // Refresh problems list
-      const myProbs = await api.get<any[]>('/api/problems/my-problems')
-      setProblems(myProbs)
+      const myProbs = await api.get<unknown[]>('/api/problems/my-problems')
+      setProblems(myProbs as import('@/lib/mockData').UserProblem[])
     } catch (err) {
       console.error(err)
       setSubmitState('idle')
@@ -188,20 +192,28 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex">
-      <UserSidebar userName={userName} unreadMessages={unreadMessages} />
+    <div className="min-h-screen bg-[#0A0A0F] flex overflow-hidden">
+      <UserSidebar userName={userName} unreadMessages={unreadMessages} mobileOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-      <main className="flex-1 min-w-0 flex flex-col">
+      <main className="flex-1 min-w-0 flex flex-col h-screen">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-          <div>
-            <h1 className="text-lg font-semibold text-white">Good morning, {userName.split(' ')[0]} 👋</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your problems</p>
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden text-slate-400 hover:text-white transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <div>
+              <h1 className="text-base md:text-lg font-semibold text-white">Good morning, {userName.split(' ')[0]} 👋</h1>
+              <p className="text-[10px] md:text-xs text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your problems</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setChatOpen(true)}
-              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] transition-all text-xs"
+              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10 transition-all text-xs"
             >
               <MessageSquare size={13} />
               Messages
@@ -215,17 +227,17 @@ useEffect(() => {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
           {/* Stats - Shown on Overview */}
           {(currentTab === 'overview' || currentTab === 'messages') && (
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {[
                 { label: 'Problems submitted', value: problems.length, color: '#F8FAFC' },
                 { label: 'Total similar reports', value: totalSimilar.toLocaleString(), color: '#06B6D4' },
                 { label: 'Developers building', value: activeDevs, color: '#10B981' },
               ].map((stat) => (
-                <div key={stat.label} className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-4">
+                <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                   <div className="text-2xl font-semibold mb-1" style={{ color: stat.color }}>{stat.value}</div>
                   <div className="text-xs text-slate-500">{stat.label}</div>
                 </div>
@@ -237,14 +249,14 @@ useEffect(() => {
           {(currentTab === 'overview' || currentTab === 'submit' || currentTab === 'messages') && (
             <section className="mb-8">
               <h2 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-3">Submit a problem</h2>
-              <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-5">
                 <textarea
                   value={problemText}
                   onChange={(e) => setProblemText(e.target.value)}
                   placeholder="Describe your problem in plain language... (e.g. My internet disconnects every time I get a call)"
                   rows={4}
                   maxLength={1000}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors resize-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors resize-none"
                 />
                 <div className="flex items-center justify-between mt-1 mb-3">
                   <span className="text-[10px] text-slate-600">Minimum 10 characters</span>
@@ -257,7 +269,7 @@ useEffect(() => {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as ProblemCategory)}
-                    className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c} className="bg-[#111118]">{c}</option>
@@ -281,8 +293,8 @@ useEffect(() => {
                 {submitResult && (
                   <div className={`mt-3 flex items-start gap-2.5 px-4 py-3 rounded-lg border ${
                     submitResult.matched
-                      ? 'bg-cyan-500/[0.08] border-cyan-500/20'
-                      : 'bg-emerald-500/[0.08] border-emerald-500/20'
+                      ? 'bg-cyan-500/10 border-cyan-500/20'
+                      : 'bg-emerald-500/10 border-emerald-500/20'
                   }`}>
                     <CheckCircle size={14} className={submitResult.matched ? 'text-cyan-400 mt-0.5 shrink-0' : 'text-emerald-400 mt-0.5 shrink-0'} />
                     <p className={`text-xs ${submitResult.matched ? 'text-cyan-300' : 'text-emerald-300'}`}>
@@ -312,7 +324,7 @@ useEffect(() => {
                   return (
                     <div
                       key={problem.id}
-                      className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-4 transition-all hover:border-white/[0.12]"
+                      className="bg-white/5 border border-white/10 rounded-xl p-4 transition-all hover:border-white/10"
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex-1 min-w-0">
@@ -357,7 +369,7 @@ useEffect(() => {
 
                           {/* Developer claimed — show chat button */}
                           {problem.claimedBy && (
-                            <div className="mt-3 flex items-center gap-2.5 pt-2.5 border-t border-white/[0.05]">
+                            <div className="mt-3 flex items-center gap-2.5 pt-2.5 border-t border-white/5">
                               <div className="w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center text-[9px] font-semibold text-indigo-300">
                                 {problem.claimedBy.avatar}
                               </div>
@@ -392,7 +404,7 @@ useEffect(() => {
 
                       {/* Expanded: similar problems from other users */}
                       {isExpanded && (
-                        <div className="mt-3 pt-3 border-t border-white/[0.05]">
+                        <div className="mt-3 pt-3 border-t border-white/5">
                           <p className="text-[11px] text-slate-500 mb-2">Similar problems from other users</p>
                           <div className="space-y-1.5">
                             {[
@@ -400,7 +412,7 @@ useEffect(() => {
                               'Data connection stops after switching wifi off, need to toggle airplane mode',
                               'Mobile network disconnects randomly, especially on 4G LTE',
                             ].map((similar, i) => (
-                              <div key={i} className="flex items-start gap-2 text-[11px] text-slate-500 pl-2 border-l border-white/[0.06]">
+                              <div key={i} className="flex items-start gap-2 text-[11px] text-slate-500 pl-2 border-l border-white/5">
                                 <AlertCircle size={10} className="text-slate-600 mt-0.5 shrink-0" />
                                 {similar}
                               </div>

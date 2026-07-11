@@ -37,8 +37,10 @@ export default function ValidatePage() {
     if (auth !== "true" || !role) {
       router.push("/login");
     } else {
-      setIsAuthenticated(true);
-      setUserRole(role);
+      setTimeout(() => {
+        setIsAuthenticated(true);
+        setUserRole(role);
+      }, 0)
     }
   }, [router]);
 
@@ -66,8 +68,8 @@ export default function ValidatePage() {
       const data = await res.json();
       setValidationResult(data);
       setHasValidated(true);
-    } catch (err: any) {
-      setError(err.message || "Connection to API failed.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Connection to API failed.");
     } finally {
       setIsLoading(false);
     }

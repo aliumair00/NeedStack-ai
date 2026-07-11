@@ -1,12 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Response, WebSocket, WebSocketDisconnect
+from typing import List, Dict
 from bson import ObjectId
 from datetime import datetime
+from jose import jwt, JWTError
 
 from database.connection import get_database
-from middleware.auth_middleware import get_current_user
+from middleware.auth_middleware import get_current_user, SECRET_KEY, ALGORITHM
 from models.message import MessageSendRequest
 from services.notification_service import create_notification
+
+class ConnectionManager:
+    def __init__(self):
+        # Maps user_id (str) to WebSocket
+        self.active_connections: Dict[str, WebSocket] = {}
+
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        self.active_connections[user_id] = websocket
+
+    def disconnect(self, user_id: str):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
+
+    async def send_personal_message(self, message: dict, user_id: str):
+        if user_id in self.active_connections:
+            try:
+                await self.active_connections[user_id].send_json(message)
+            except Exception:
+                self.disconnect(user_id)
+
+manager = ConnectionManager()
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
 
@@ -83,7 +106,7 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
             "unread_count": conv["unread_count"]
         })
         
-    result.sort(key=lambda x: conv["last_time"], reverse=True)
+    result.sort(key=lambda x: x["last_time"], reverse=True)
     return result
 
 @router.get("/{cluster_id}/{other_user_id}")
@@ -141,6 +164,26 @@ async def get_messages(cluster_id: str, other_user_id: str, current_user: dict =
 async def options_messages():
     return Response(status_code=204)
 
+@router.websocket("/ws/{token}")
+async def websocket_endpoint(websocket: WebSocket, token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            await websocket.close(code=1008)
+            return
+    except JWTError:
+        await websocket.close(code=1008)
+        return
+        
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            # Wait for any incoming message to keep connection open (ping/pong)
+            data = await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)
+
 @router.post("")
 async def send_message(req: MessageSendRequest, current_user: dict = Depends(get_current_user)):
     """Create a new message in a conversation."""
@@ -159,6 +202,18 @@ async def send_message(req: MessageSendRequest, current_user: dict = Depends(get
     }
     
     res = await db.messages.insert_one(msg)
+    
+    # Broadcast to receiver via WebSocket
+    msg_dict = {
+        "id": str(res.inserted_id),
+        "senderId": str(user_id),
+        "receiverId": str(receiver_id),
+        "clusterId": str(cluster_id),
+        "content": req.content,
+        "time": "Just now",
+        "isMe": False
+    }
+    await manager.send_personal_message(msg_dict, str(receiver_id))
     
     # Notify
     sender_name = current_user["full_name"].split(" ")[0]

@@ -19,8 +19,10 @@ export default function LandingPage() {
     const auth = localStorage.getItem("is_authenticated");
     const userRole = localStorage.getItem("user_role");
     if (auth === "true" && userRole) {
-      setIsAuthenticated(true);
-      setRole(userRole);
+      setTimeout(() => {
+        setIsAuthenticated(true);
+        setRole(userRole);
+      }, 0)
     }
 
     const fetchStats = async () => {

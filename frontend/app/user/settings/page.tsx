@@ -34,20 +34,22 @@ function UserSettingsContent() {
     if (auth !== 'true' || role !== 'user') {
       router.push('/login')
     } else {
-      setIsAuthenticated(true)
-      if (email) {
-        setUserEmail(email)
-        setEmailInput(email)
-      }
-      if (name) {
-        setUserName(name)
-        setNameInput(name)
-      } else if (email) {
-        const prefix = email.split('@')[0]
-        const formattedName = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace('.', ' ')
-        setUserName(formattedName || 'Ali Hassan')
-        setNameInput(formattedName || 'Ali Hassan')
-      }
+      setTimeout(() => {
+        setIsAuthenticated(true)
+        if (email) {
+          setUserEmail(email)
+          setEmailInput(email)
+        }
+        if (name) {
+          setUserName(name)
+          setNameInput(name)
+        } else if (email) {
+          const prefix = email.split('@')[0]
+          const formattedName = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace('.', ' ')
+          setUserName(formattedName || 'Ali Hassan')
+          setNameInput(formattedName || 'Ali Hassan')
+        }
+      }, 0)
     }
   }, [router])
 
@@ -84,7 +86,7 @@ function UserSettingsContent() {
 
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div>
             <h1 className="text-lg font-semibold text-white">Settings</h1>
             <p className="text-xs text-slate-500 mt-0.5">Manage your account preferences and details</p>
@@ -95,8 +97,8 @@ function UserSettingsContent() {
           <div className="max-w-3xl mx-auto space-y-8">
             
             {/* Profile Section */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
                   <User size={16} />
                 </div>
@@ -112,7 +114,7 @@ function UserSettingsContent() {
                     type="text" 
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   />
                 </div>
                 <div>
@@ -121,15 +123,15 @@ function UserSettingsContent() {
                     type="email" 
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   />
                 </div>
               </div>
             </section>
 
             {/* Security Section */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
                   <Shield size={16} />
                 </div>
@@ -146,7 +148,7 @@ function UserSettingsContent() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
                   />
                 </div>
                 <div>
@@ -156,15 +158,15 @@ function UserSettingsContent() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min 8 characters"
-                    className="w-full bg-[#111118] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+                    className="w-full bg-[#111118] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-amber-500/50 transition-colors"
                   />
                 </div>
               </div>
             </section>
 
             {/* Notifications Section */}
-            <section className="bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/[0.05] flex items-center gap-3">
+            <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <Bell size={16} />
                 </div>
@@ -187,7 +189,7 @@ function UserSettingsContent() {
                   </button>
                 </div>
                 
-                <div className="h-px bg-white/[0.05] w-full my-4" />
+                <div className="h-px bg-white/5 w-full my-4" />
                 
                 <div className="flex items-center justify-between">
                   <div>
@@ -205,7 +207,7 @@ function UserSettingsContent() {
             </section>
 
             {/* Save Actions */}
-            <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/5">
               {saveSuccess && (
                 <div className="flex items-center gap-2 text-emerald-400 text-sm">
                   <CheckCircle2 size={16} />

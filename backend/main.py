@@ -12,6 +12,8 @@ import os
 from contextlib import asynccontextmanager
 from database.connection import connect_to_mongo, close_mongo_connection
 from routers import auth, problems, analytics, admin, developer, messages, notifications, settings
+from starlette.middleware.base import BaseHTTPMiddleware
+from middleware.rate_limit import rate_limit_middleware
 
 load_dotenv()
 
@@ -29,15 +31,25 @@ app.add_middleware(
     allow_origins=[
         "https://need-stack-w7jt.vercel.app",  # apna exact Vercel URL
         "http://localhost:3000",  # local development ke liye
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Rate Limiting Middleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=rate_limit_middleware)
+
 @app.get("/")
 async def root():
     return {"message": "Needstack AI API is running"}
+
+@app.get("/api/test-reload")
+async def test_reload():
+    return {"status": "reloaded"}
 
 app.include_router(auth.router)
 app.include_router(problems.router)

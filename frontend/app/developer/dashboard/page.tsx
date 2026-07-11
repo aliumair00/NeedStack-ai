@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Flame, CheckCircle, Clock, TrendingUp, MessageSquare, Users, Loader2, Search } from 'lucide-react'
+import { Flame, CheckCircle, Clock, TrendingUp, MessageSquare, Users, Loader2, Search, Menu } from 'lucide-react'
 import DevSidebar from '@/components/developer/DevSidebar'
 import ConfidenceRing from '@/components/developer/ConfidenceRing'
 import ClaimModal from '@/components/developer/ClaimModal'
@@ -38,7 +38,7 @@ function DeveloperDashboardContent() {
   
   useEffect(() => {
     if (searchParams.get('tab')) {
-      setTab(searchParams.get('tab') as Tab)
+      setTimeout(() => setTab(searchParams.get('tab') as Tab), 0)
     }
   }, [searchParams])
 
@@ -56,7 +56,9 @@ function DeveloperDashboardContent() {
 
   const [claimModalCard, setClaimModalCard] = useState<ProblemCard | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeChatConvId, setActiveChatConvId] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const unreadMessages = conversations.reduce((a, c) => a + c.unreadCount, 0)
   const activeClaims = claims.filter((c) => c.progressStatus !== 'solved').length
@@ -64,12 +66,13 @@ function DeveloperDashboardContent() {
   useEffect(() => {
     const savedName = localStorage.getItem('user_full_name')
     if (savedName) {
-      setRealName(savedName)
+      setTimeout(() => setRealName(savedName), 0)
     }
 
     ;(async () => {
+      if (localStorage.getItem('is_authenticated') !== 'true') return;
       try {
-        const data = await api.get<any>('/api/auth/me')
+        const data = await api.get<{ full_name: string }>('/api/auth/me')
         setRealName(data.full_name)
         localStorage.setItem('user_full_name', data.full_name)
       } catch (e) {
@@ -95,23 +98,23 @@ function DeveloperDashboardContent() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const myClaims = await api.get<any[]>('/api/developer/my-claims')
+      const myClaims = await api.get<{ claim_id: string, cluster_id: string, title: string, category: string, reportCount: number, progressStatus: string, userCount: number, claimedAt: string, note?: string }[]>('/api/developer/my-claims')
       setClaims(myClaims.map(c => ({
         id: c.claim_id,
         cardId: c.cluster_id,
         title: c.title,
-        category: c.category,
+        category: c.category as import('@/lib/mockData').ProblemCategory,
         reportCount: c.reportCount,
-        progressStatus: c.progressStatus,
+        progressStatus: c.progressStatus as 'testing' | 'in_progress' | 'solved',
         userCount: c.userCount,
         claimedAt: c.claimedAt,
         note: c.note
       })))
 
-      const notifs = await api.get<any[]>('/api/notifications')
-      setNotifications(notifs.map((n: any) => ({
+      const notifs = await api.get<{ id: string, type: string, message: string, time: string, is_read: boolean, problem_id: string, cluster_id: string }[]>('/api/notifications')
+      setNotifications(notifs.map((n) => ({
         id: n.id,
-        type: n.type,
+        type: n.type as 'solved' | 'claim' | 'similar' | 'message',
         message: n.message,
         time: n.time,
         isRead: n.is_read,
@@ -119,8 +122,8 @@ function DeveloperDashboardContent() {
         clusterId: n.cluster_id
       })))
 
-      const convs = await api.get<any[]>('/api/messages/conversations')
-      setConversations(convs.map((c: any) => ({
+      const convs = await api.get<{ conversation_id: string, other_user_name: string, other_user_avatar: string, problem_title: string, last_message: string, last_time: string, unread_count: number }[]>('/api/messages/conversations')
+      setConversations(convs.map((c) => ({
         id: c.conversation_id,
         userName: c.other_user_name,
         userAvatar: c.other_user_avatar,
@@ -131,9 +134,9 @@ function DeveloperDashboardContent() {
         messages: [],
       })))
 
-      const stats = await api.get<any>('/api/analytics/stats')
-      setReportsToday(stats.reportsToday || '0')
-      setSolvedThisWeek(stats.solvedThisWeek || '0')
+      const stats = await api.get<{ reportsToday: number, solvedThisWeek: number }>('/api/analytics/stats')
+      setReportsToday(stats.reportsToday.toString())
+      setSolvedThisWeek(stats.solvedThisWeek.toString())
     } catch (err) {
       console.error('Failed to load dashboard data:', err)
     }
@@ -146,8 +149,11 @@ function DeveloperDashboardContent() {
     if (auth !== 'true' || role !== 'developer') {
       router.push('/login')
     } else {
-      fetchProblems()
-      fetchDashboardData()
+      setTimeout(() => {
+        setIsAuthenticated(true)
+        fetchProblems()
+        fetchDashboardData()
+      }, 0)
     }
   }, [router, fetchProblems, fetchDashboardData])
 
@@ -156,7 +162,7 @@ function DeveloperDashboardContent() {
     const auth = localStorage.getItem('is_authenticated')
     const role = localStorage.getItem('user_role')
     if (auth === 'true' && role === 'developer') {
-      fetchProblems()
+      setTimeout(() => fetchProblems(), 0)
     }
   }, [filterCategory, sortBy, onlyTrending, searchQuery, fetchProblems])
 
@@ -223,18 +229,34 @@ function DeveloperDashboardContent() {
     }
   }, [])
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+        <Loader2 className="text-indigo-500 animate-spin" size={32} />
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex">
+    <div className="min-h-screen bg-[#0A0A0F] flex overflow-hidden">
       <DevSidebar
         developerName={realName || "Developer"}
         activeClaims={activeClaims}
         unreadMessages={unreadMessages}
+        mobileOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
       />
 
-      <main className="flex-1 min-w-0 flex flex-col">
+      <main className="flex-1 min-w-0 flex flex-col h-screen">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-1 flex-wrap">
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
+          <div className="flex items-center gap-1 md:gap-3 flex-wrap">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden text-slate-400 hover:text-white transition-colors mr-2"
+            >
+              <Menu size={20} />
+            </button>
             {(['browse', 'claims', 'messages'] as Tab[]).map((t) => (
               <button
                 key={t}
@@ -252,7 +274,7 @@ function DeveloperDashboardContent() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => openChat()}
-              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-400 hover:text-slate-200 transition-all text-xs"
+              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 transition-all text-xs"
             >
               <MessageSquare size={13} />
               Messages
@@ -266,20 +288,20 @@ function DeveloperDashboardContent() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
           {/* ── BROWSE TAB ── */}
           {tab === 'browse' && (
             <>
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-3 mb-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                 {[
                   { label: 'Total problems', value: cards.length, color: '#F8FAFC' },
                   { label: 'My active claims', value: activeClaims, color: '#F59E0B' },
                   { label: 'Reports today', value: reportsToday, color: '#06B6D4' },
                   { label: 'Solved this week', value: solvedThisWeek, color: '#10B981' },
                 ].map((s) => (
-                  <div key={s.label} className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-4">
+                  <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <div className="text-xl font-semibold mb-1" style={{ color: s.color }}>{s.value}</div>
                     <div className="text-[11px] text-slate-500">{s.label}</div>
                   </div>
@@ -295,13 +317,13 @@ function DeveloperDashboardContent() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search problems..."
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
                   />
                 </div>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-slate-400 focus:outline-none"
+                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-400 focus:outline-none"
                 >
                   <option value="most_reported">Most reported</option>
                   <option value="trending">Trending</option>
@@ -312,7 +334,7 @@ function DeveloperDashboardContent() {
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border transition-all ${
                     onlyTrending
                       ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                      : 'border-white/[0.08] text-slate-500 hover:border-white/20'
+                      : 'border-white/10 text-slate-500 hover:border-white/20'
                   }`}
                 >
                   <Flame size={12} />
@@ -329,7 +351,7 @@ function DeveloperDashboardContent() {
                     className={`px-3 py-1 rounded-full text-[11px] border transition-all ${
                       filterCategory === cat
                         ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400'
-                        : 'border-white/[0.08] text-slate-500 hover:border-white/20 hover:text-slate-400'
+                        : 'border-white/10 text-slate-500 hover:border-white/20 hover:text-slate-400'
                     }`}
                   >
                     {cat}
@@ -367,7 +389,7 @@ function DeveloperDashboardContent() {
                 {claims.map((claim) => {
                   const prog = PROGRESS_CONFIG[claim.progressStatus]
                   return (
-                    <div key={claim.id} className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-5">
+                    <div key={claim.id} className="bg-white/3 border border-white/10 rounded-xl p-5">
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1.5">
@@ -389,7 +411,7 @@ function DeveloperDashboardContent() {
                           </div>
                           <h3 className="text-sm font-medium text-white">{claim.title}</h3>
                           {claim.note && (
-                            <p className="text-xs text-slate-500 mt-1 italic">"{claim.note}"</p>
+                            <p className="text-xs text-slate-500 mt-1 italic">&quot;{claim.note}&quot;</p>
                           )}
                         </div>
                         <div className="text-right shrink-0">
@@ -398,7 +420,7 @@ function DeveloperDashboardContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 pt-3 border-t border-white/[0.05]">
+                      <div className="flex items-center gap-2 pt-3 border-t border-white/5">
                         <button
                           onClick={async () => {
                             try {
@@ -429,7 +451,7 @@ function DeveloperDashboardContent() {
                               handleTabChange('messages')
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-xs text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all"
                         >
                           <Users size={12} />
                           Message users
@@ -467,7 +489,7 @@ function DeveloperDashboardContent() {
                   <button
                     key={conv.id}
                     onClick={() => openChat(conv.id)}
-                    className="w-full flex items-start gap-3 p-4 bg-white/[0.03] border border-white/[0.07] rounded-xl hover:border-white/[0.12] transition-all text-left"
+                    className="w-full flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-white/10 transition-all text-left"
                   >
                     <div className="w-10 h-10 rounded-full bg-cyan-500/15 flex items-center justify-center text-sm font-semibold text-cyan-300 shrink-0">
                       {conv.userAvatar}
@@ -536,7 +558,7 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
   }
 
   return (
-    <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.14] transition-all flex flex-col">
+    <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/15 transition-all flex flex-col">
       {/* Top row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
@@ -570,14 +592,14 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
       {/* Keywords */}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {card.keywords.map((kw) => (
-          <span key={kw} className="bg-white/[0.05] border border-white/[0.08] rounded px-1.5 py-0.5 text-[10px] text-slate-500 font-mono">
+          <span key={kw} className="bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-slate-500 font-mono">
             {kw}
           </span>
         ))}
       </div>
 
       {/* Bottom */}
-      <div className="flex items-center gap-2 mt-auto pt-3 border-t border-white/[0.05]">
+      <div className="flex items-center gap-2 mt-auto pt-3 border-t border-white/5">
         <span
           className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
           style={{ color: status.color, background: status.bg, borderColor: status.border }}

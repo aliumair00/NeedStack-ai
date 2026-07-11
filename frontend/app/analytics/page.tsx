@@ -73,8 +73,10 @@ export default function AnalyticsPage() {
     if (auth !== "true" || !role) {
       router.push("/login");
     } else {
-      setIsAuthenticated(true);
-      setUserRole(role);
+      setTimeout(() => {
+        setIsAuthenticated(true);
+        setUserRole(role);
+      }, 0)
     }
   }, [router]);
 
@@ -84,21 +86,20 @@ export default function AnalyticsPage() {
 
     // 1. Fetch Stats
     try {
-      const data = await api.get<any>(`/api/analytics/stats?range=${activeTimeRange}`);
+      const data = await api.get<{ totalProblems: string, activeClusters: string, totalDevelopers: string, matchRate: string, avgConfidence?: string, trendingCategories?: string }>(`/api/analytics/stats?range=${activeTimeRange}`);
       setStatCards([
         { label: "Total Problems", value: data.totalProblems, hasShimmer: true },
-        { label: "Active Clusters", value: data.activeClusters },
-        { label: "Avg Confidence", value: data.avgConfidence },
-        { label: "Trending Clusters", value: data.trendingCategories },
-      ]);
+        { label: "Match Rate", value: data.matchRate },
+        { label: "Avg Confidence", value: data.avgConfidence || "0%" },
+        { label: "Trending Categories", value: data.trendingCategories || "0" }    ]);
     } catch (err) {
       console.warn("Stats fetch failed:", err);
     }
 
     // 2. Fetch Category Distribution
     try {
-      const data = await api.get<any[]>(`/api/analytics/categories?range=${activeTimeRange}`);
-      const formatted = data.map((c: any) => {
+      const data = await api.get<{ name: string, percent: number }[]>(`/api/analytics/categories?range=${activeTimeRange}`);
+      const formatted = data.map((c) => {
         const style = CATEGORY_STYLE_MAP[c.name] || CATEGORY_STYLE_MAP["Other"];
         return {
           name: c.name,
@@ -122,8 +123,8 @@ export default function AnalyticsPage() {
 
     // 4. Fetch Cluster t-SNE Map
     try {
-      const data = await api.get<any[]>("/api/analytics/cluster-map");
-      const formatted = data.map((d: any) => {
+      const data = await api.get<{ id: number, top: string, left: string, size: string, label: string, category: string, reportCount: number }[]>("/api/analytics/cluster-map");
+      const formatted = data.map((d) => {
         const style = CATEGORY_STYLE_MAP[d.category] || CATEGORY_STYLE_MAP["Other"];
         return {
           id: d.id,
@@ -145,7 +146,7 @@ export default function AnalyticsPage() {
 
   // Fetch data on mount and when time range changes
   useEffect(() => {
-    fetchAnalyticsData();
+    setTimeout(() => fetchAnalyticsData(), 0);
   }, [fetchAnalyticsData]);
 
   // Poll every 15 seconds for near-real-time updates

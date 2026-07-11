@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", 10080))  # 7 days
-SECRET_KEY = os.getenv("JWT_SECRET", "default-secret-key")
+SECRET_KEY = os.getenv("JWT_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("CRITICAL ERROR: JWT_SECRET environment variable is missing!")
 ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

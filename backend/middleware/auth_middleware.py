@@ -7,7 +7,9 @@ from typing import Optional
 from database.connection import get_database
 from bson import ObjectId
 
-SECRET_KEY = os.getenv("JWT_SECRET", "default-secret-key")
+SECRET_KEY = os.getenv("JWT_SECRET")
+if not SECRET_KEY:
+    raise RuntimeError("CRITICAL ERROR: JWT_SECRET environment variable is missing!")
 ALGORITHM = "HS256"
 
 security = HTTPBearer()

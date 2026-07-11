@@ -19,9 +19,11 @@ interface NavItem {
 interface UserSidebarProps {
   userName: string
   unreadMessages: number
+  mobileOpen?: boolean
+  onClose?: () => void
 }
 
-export default function UserSidebar({ userName, unreadMessages }: UserSidebarProps) {
+export default function UserSidebar({ userName, unreadMessages, mobileOpen, onClose }: UserSidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentTab = searchParams.get('tab') || 'overview'
@@ -56,9 +58,21 @@ export default function UserSidebar({ userName, unreadMessages }: UserSidebarPro
   }
 
   return (
-    <aside className="w-[220px] shrink-0 bg-[#0D0D15] border-r border-white/[0.06] flex flex-col">
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-5 py-5 border-b border-white/[0.05]">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          onClick={onClose}
+        />
+      )}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-[220px] bg-[#0D0D15] border-r border-white/5 flex flex-col shrink-0
+        transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        {/* Logo */}
+      <div className="flex items-center gap-2 px-5 py-5 border-b border-white/5">
         <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_6px_#6366F1]" />
         <span className="text-white font-semibold text-sm tracking-tight">Needstack AI</span>
       </div>
@@ -71,11 +85,12 @@ export default function UserSidebar({ userName, unreadMessages }: UserSidebarPro
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`
                 flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all
                 ${isActive
                   ? 'bg-indigo-500/10 text-indigo-400'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.04]'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
                 }
               `}
             >
@@ -90,13 +105,14 @@ export default function UserSidebar({ userName, unreadMessages }: UserSidebarPro
           )
         })}
 
-        <div className="h-px bg-white/[0.05] my-3" />
+        <div className="h-px bg-white/5 my-3" />
 
         {bottomItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:bg-white/[0.04] transition-all"
+            onClick={onClose}
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all"
           >
             <span className="shrink-0">{item.icon}</span>
             {item.label}
@@ -105,7 +121,7 @@ export default function UserSidebar({ userName, unreadMessages }: UserSidebarPro
       </nav>
 
       {/* User info + logout */}
-      <div className="p-3 border-t border-white/[0.05]">
+      <div className="p-3 border-t border-white/5">
         <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg">
           <div className="w-7 h-7 rounded-full bg-indigo-500/25 flex items-center justify-center text-[11px] font-semibold text-indigo-300 shrink-0">
             {initials}
@@ -124,5 +140,6 @@ export default function UserSidebar({ userName, unreadMessages }: UserSidebarPro
         </div>
       </div>
     </aside>
+    </>
   )
 }

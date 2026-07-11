@@ -1,11 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from .base import MongoBaseModel
+from utils.validators import SafeStr
 
 class ProblemSubmit(BaseModel):
-    text: str
-    category: str
+    model_config = ConfigDict(extra="forbid")
+    
+    text: SafeStr = Field(min_length=10, max_length=1500)
+    category: SafeStr = Field(min_length=2, max_length=50)
 
 class ProblemResponse(MongoBaseModel):
     text: str
@@ -38,7 +41,9 @@ class MyProblemItem(BaseModel):
     clusterId: str
 
 class ValidateRequest(BaseModel):
-    text: str
+    model_config = ConfigDict(extra="forbid")
+    
+    text: SafeStr = Field(min_length=10, max_length=1500)
 
 class ValidationCluster(BaseModel):
     id: str

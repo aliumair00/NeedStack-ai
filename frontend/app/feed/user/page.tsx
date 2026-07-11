@@ -68,7 +68,7 @@ function UserFeedContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchFeed(activeFilter);
+      setTimeout(() => fetchFeed(activeFilter), 0);
     }
   }, [isAuthenticated, activeFilter]);
 
@@ -76,7 +76,7 @@ function UserFeedContent() {
   useEffect(() => {
     const action = searchParams.get("action");
     if (action === "submit") {
-      setIsSubmissionOpen(true);
+      setTimeout(() => setIsSubmissionOpen(true), 0);
       const element = document.getElementById("submission-container");
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });

@@ -3,9 +3,11 @@
 import { useState, useMemo, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
-  Users, Code2, Layers, TrendingUp, CheckCircle,
-  Clock, Search, Star, StarOff, Trash2, ShieldOff,
-  ShieldCheck, AlertTriangle, Activity,
+  LayoutDashboard, Users, Code2, Layers,
+  BarChart2, Settings, LogOut, Shield,
+  MoreVertical, CheckCircle, XCircle, Clock, Trash2, 
+  ExternalLink, Search, Star, StarOff, AlertTriangle, Menu,
+  ShieldOff, ShieldCheck, TrendingUp, Activity, Loader2
 } from 'lucide-react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { api } from '@/lib/api'
@@ -13,7 +15,6 @@ import {
   AdminUser,
   AdminDeveloper,
   AdminCluster,
-  UserStatus,
   DevStatus,
 } from '@/lib/adminMockData'
 import { CATEGORY_COLORS, CATEGORY_BG } from '@/lib/mockData'
@@ -42,18 +43,19 @@ function AdminDashboardContent() {
   const defaultTab = (searchParams.get('tab') as Tab) || 'overview'
 
   const [tab, setTab] = useState<Tab>(defaultTab)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('tab')) {
-      setTab(searchParams.get('tab') as Tab)
+      setTimeout(() => setTab(searchParams.get('tab') as Tab), 0)
     }
   }, [searchParams])
 
   const [users, setUsers] = useState<AdminUser[]>([])
   const [developers, setDevelopers] = useState<AdminDeveloper[]>([])
   const [clusters, setClusters] = useState<AdminCluster[]>([])
-  const [activity, setActivity] = useState<any[]>([])
-  const [stats, setStats] = useState<any>({
+  const [activity, setActivity] = useState<{ id: string, type: string, action: string, message: string, time: string }[]>([])
+  const [stats, setStats] = useState<{ totalUsers: number, totalDevelopers: number, totalProblems: number, totalClusters: number, pendingApprovals: number, avgConfidence: number, problemsClaimedToday: number, problemsSolvedThisWeek: number, [key: string]: unknown }>({
     totalUsers: 0,
     totalDevelopers: 0,
     totalProblems: 0,
@@ -62,6 +64,17 @@ function AdminDashboardContent() {
     avgConfidence: 0,
     problemsClaimedToday: 0,
     problemsSolvedThisWeek: 0,
+  })
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  
+  const [analyticsCategories, setAnalyticsCategories] = useState<{ name: string, percentage: number, percent?: number, count?: number }[]>([])
+  const [analyticsStats, setAnalyticsStats] = useState<{ claimRate: number, solveRate: number, avgClusterSize: number, avgTimeResolve: string, growthPct?: number, [key: string]: unknown }>({
+    claimRate: 0,
+    solveRate: 0,
+    avgClusterSize: 0,
+    avgTimeResolve: '0h',
+    growthPct: 0
   })
 
   const [userSearch, setUserSearch] = useState('')
@@ -73,7 +86,7 @@ function AdminDashboardContent() {
 
   const fetchAdminData = useCallback(async () => {
     try {
-      const statsData = await api.get<any>('/api/admin/stats')
+      const statsData = await api.get<{ totalUsers: number, totalDevelopers: number, totalProblems: number, totalClusters: number, pendingApprovals: number, avgConfidence: number, problemsClaimedToday: number, problemsSolvedThisWeek: number, [key: string]: unknown }>('/api/admin/stats')
       setStats(statsData)
 
       const usersData = await api.get<AdminUser[]>('/api/admin/users')
@@ -85,8 +98,14 @@ function AdminDashboardContent() {
       const clustersData = await api.get<AdminCluster[]>('/api/admin/clusters')
       setClusters(clustersData)
 
-      const activityData = await api.get<any[]>('/api/admin/activity')
+      const activityData = await api.get<{ id: string, type: string, action: string, message: string, time: string }[]>('/api/admin/activity')
       setActivity(activityData)
+      
+      const catData = await api.get<{ name: string, percentage: number, percent?: number, count?: number }[]>('/api/analytics/categories?range=7d')
+      setAnalyticsCategories(catData)
+      
+      const aStatsData = await api.get<{ claimRate: number, solveRate: number, avgClusterSize: number, avgTimeResolve: string, growthPct?: number, [key: string]: unknown }>('/api/analytics/stats?range=7d')
+      setAnalyticsStats(aStatsData)
     } catch (err) {
       console.error('Failed to load admin data:', err)
     }
@@ -99,7 +118,10 @@ function AdminDashboardContent() {
     if (auth !== 'true' || role !== 'admin') {
       router.push('/login')
     } else {
-      fetchAdminData()
+      setTimeout(() => {
+        setIsAuthenticated(true)
+        fetchAdminData()
+      }, 0)
     }
   }, [router, fetchAdminData])
 
@@ -194,14 +216,33 @@ function AdminDashboardContent() {
     router.push(`/admin/dashboard${t !== 'overview' ? `?tab=${t}` : ''}`)
   }
 
-  return (
-    <div className="min-h-screen bg-[#0A0A0F] flex">
-      <AdminSidebar pendingApprovals={pendingDevs.length} totalUsers={users.length} />
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
+        <Loader2 className="text-indigo-500 animate-spin" size={32} />
+      </div>
+    )
+  }
 
-      <main className="flex-1 min-w-0 flex flex-col">
+  return (
+    <div className="min-h-screen bg-[#0A0A0F] flex overflow-hidden">
+      <AdminSidebar 
+        pendingApprovals={pendingDevs.length} 
+        totalUsers={users.length} 
+        mobileOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
+
+      <main className="flex-1 min-w-0 flex flex-col h-screen">
         {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-1 flex-wrap">
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
+          <div className="flex items-center gap-1 md:gap-3 flex-wrap">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden text-slate-400 hover:text-white transition-colors mr-2"
+            >
+              <Menu size={20} />
+            </button>
             {TABS.map((t) => (
               <button
                 key={t.key}
@@ -219,10 +260,10 @@ function AdminDashboardContent() {
               </button>
             ))}
           </div>
-          <span className="text-[11px] text-slate-600">Last updated: just now</span>
+          <span className="hidden md:inline text-[11px] text-slate-600">Last updated: just now</span>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
           {/* ── OVERVIEW TAB ── */}
           {tab === 'overview' && (
@@ -239,7 +280,7 @@ function AdminDashboardContent() {
                   { label: 'Solved this week', value: stats.problemsSolvedThisWeek, color: '#34D399', icon: <CheckCircle size={14} /> },
                   { label: 'Active clusters', value: stats.totalClusters, color: '#94A3B8', icon: <Layers size={14} /> },
                 ].map((s) => (
-                  <div key={s.label} className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-4">
+                  <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[11px] text-slate-500">{s.label}</span>
                       <span style={{ color: s.color }} className="opacity-60">{s.icon}</span>
@@ -257,11 +298,11 @@ function AdminDashboardContent() {
                       <AlertTriangle size={12} className="text-amber-400" />
                       Pending developer approvals ({pendingDevs.length})
                     </h2>
-                    <div className="bg-amber-500/[0.05] border border-amber-500/[0.15] rounded-xl overflow-hidden">
+                    <div className="bg-amber-500/5 border border-amber-500/15 rounded-xl overflow-hidden">
                       {pendingDevs.map((dev, i) => (
                         <div
                           key={dev.id}
-                          className={`flex items-center gap-3 px-4 py-3.5 ${i < pendingDevs.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
+                          className={`flex items-center gap-3 px-4 py-3.5 ${i < pendingDevs.length - 1 ? 'border-b border-white/5' : ''}`}
                         >
                           <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-semibold text-indigo-300 shrink-0">
                             {dev.avatar}
@@ -299,11 +340,11 @@ function AdminDashboardContent() {
                     <Activity size={12} />
                     Recent activity
                   </h2>
-                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+                  <div className="bg-white/5 border border-white/5 rounded-xl overflow-hidden">
                     {activity.map((item, i) => (
                       <div
                         key={item.id}
-                        className={`flex items-center gap-3 px-4 py-3 ${i < activity.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
+                        className={`flex items-center gap-3 px-4 py-3 ${i < activity.length - 1 ? 'border-b border-white/5' : ''}`}
                       >
                         <div className={`w-6 h-6 rounded-full ${ACTIVITY_BG[item.type as keyof typeof ACTIVITY_BG] || 'bg-slate-500/10'} flex items-center justify-center shrink-0`}>
                           {ACTIVITY_ICONS[item.type as keyof typeof ACTIVITY_ICONS] || <Clock size={11} className="text-slate-400" />}
@@ -330,14 +371,14 @@ function AdminDashboardContent() {
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
                     placeholder="Search users..."
-                    className="bg-white/[0.04] border border-white/[0.08] rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 w-56"
+                    className="bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 w-56"
                   />
                 </div>
               </div>
 
-              <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+              <div className="bg-white/5 border border-white/5 rounded-xl overflow-hidden">
                 {/* Table header */}
-                <div className="grid grid-cols-[1.5fr_1.5fr_80px_120px_80px_120px] gap-3 px-4 py-2.5 border-b border-white/[0.06] text-[10px] text-slate-500 uppercase tracking-wider">
+                <div className="grid grid-cols-[1.5fr_1.5fr_80px_120px_80px_120px] gap-3 px-4 py-2.5 border-b border-white/5 text-[10px] text-slate-500 uppercase tracking-wider">
                   <span>User</span>
                   <span>Email</span>
                   <span>Problems</span>
@@ -349,7 +390,7 @@ function AdminDashboardContent() {
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={`grid grid-cols-[1.5fr_1.5fr_80px_120px_80px_120px] gap-3 px-4 py-3 border-b border-white/[0.04] last:border-0 items-center ${user.status === 'banned' ? 'opacity-60' : ''}`}
+                    className={`grid grid-cols-[1.5fr_1.5fr_80px_120px_80px_120px] gap-3 px-4 py-3 border-b border-white/5 last:border-0 items-center ${user.status === 'banned' ? 'opacity-60' : ''}`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${user.status === 'banned' ? 'bg-red-500/15 text-red-400' : 'bg-indigo-500/20 text-indigo-300'}`}>
@@ -379,7 +420,7 @@ function AdminDashboardContent() {
                         className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] border transition-all ${
                           user.status === 'banned'
                             ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
-                            : 'bg-red-500/[0.07] border-red-500/15 text-red-400 hover:bg-red-500/15'
+                            : 'bg-red-500/10 border-red-500/15 text-red-400 hover:bg-red-500/15'
                         }`}
                       >
                         {user.status === 'banned' ? <><ShieldCheck size={10} /> Unban</> : <><ShieldOff size={10} /> Ban</>}
@@ -408,7 +449,7 @@ function AdminDashboardContent() {
                       className={`px-3 py-1 rounded-full text-[11px] border transition-all capitalize ${
                         devFilter === f
                           ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400'
-                          : 'border-white/[0.08] text-slate-500 hover:border-white/20'
+                          : 'border-white/10 text-slate-500 hover:border-white/20'
                       }`}
                     >
                       {f === 'all' ? 'All' : f}
@@ -424,12 +465,12 @@ function AdminDashboardContent() {
                 {filteredDevs.map((dev) => (
                   <div
                     key={dev.id}
-                    className={`bg-white/[0.03] border rounded-xl p-4 ${
+                    className={`bg-white/5 border rounded-xl p-4 ${
                       dev.status === 'pending'
                         ? 'border-amber-500/20'
                         : dev.status === 'banned'
                         ? 'border-red-500/15 opacity-60'
-                        : 'border-white/[0.07]'
+                        : 'border-white/10'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -454,10 +495,10 @@ function AdminDashboardContent() {
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-500 mb-2">{dev.email}</p>
-                        {dev.bio && <p className="text-xs text-slate-400 mb-2 italic">"{dev.bio}"</p>}
+                        {dev.bio && <p className="text-xs text-slate-400 mb-2 italic">&quot;{dev.bio}&quot;</p>}
                         <div className="flex flex-wrap gap-1.5 mb-2">
                           {dev.skills.map((s) => (
-                            <span key={s} className="bg-white/[0.05] border border-white/[0.08] rounded px-1.5 py-0.5 text-[10px] text-slate-500 font-mono">
+                            <span key={s} className="bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-slate-500 font-mono">
                               {s}
                             </span>
                           ))}
@@ -489,7 +530,7 @@ function AdminDashboardContent() {
                         {dev.status === 'approved' && (
                           <button
                             onClick={() => setConfirmAction({ type: 'ban_dev', id: dev.id, name: dev.name })}
-                            className="flex items-center gap-1 bg-red-500/[0.07] border border-red-500/15 rounded-lg px-3 py-1.5 text-[11px] text-red-400 hover:bg-red-500/15 transition-all"
+                            className="flex items-center gap-1 bg-red-500/10 border border-red-500/15 rounded-lg px-3 py-1.5 text-[11px] text-red-400 hover:bg-red-500/15 transition-all"
                           >
                             <ShieldOff size={11} /> Ban
                           </button>
@@ -522,7 +563,7 @@ function AdminDashboardContent() {
                     value={clusterSearch}
                     onChange={(e) => setClusterSearch(e.target.value)}
                     placeholder="Search clusters..."
-                    className="bg-white/[0.04] border border-white/[0.08] rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 w-56"
+                    className="bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 w-56"
                   />
                 </div>
               </div>
@@ -531,7 +572,7 @@ function AdminDashboardContent() {
                 {filteredClusters.map((cluster) => (
                   <div
                     key={cluster.id}
-                    className={`flex items-center gap-3 bg-white/[0.03] border rounded-xl px-4 py-3.5 ${cluster.isFeatured ? 'border-indigo-500/25' : 'border-white/[0.07]'}`}
+                    className={`flex items-center gap-3 bg-white/5 border rounded-xl px-4 py-3.5 ${cluster.isFeatured ? 'border-indigo-500/25' : 'border-white/10'}`}
                   >
                     {cluster.isFeatured && (
                       <Star size={13} className="text-indigo-400 shrink-0" />
@@ -571,7 +612,7 @@ function AdminDashboardContent() {
                         className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] border transition-all ${
                           cluster.isFeatured
                             ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/25'
-                            : 'bg-white/[0.04] border-white/[0.08] text-slate-500 hover:text-slate-300'
+                            : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300'
                         }`}
                         title={cluster.isFeatured ? 'Unfeature' : 'Feature'}
                       >
@@ -579,7 +620,7 @@ function AdminDashboardContent() {
                       </button>
                       <button
                         onClick={() => setConfirmAction({ type: 'delete_cluster', id: cluster.id, name: cluster.title })}
-                        className="flex items-center gap-1 bg-red-500/[0.07] border border-red-500/15 rounded-lg px-2.5 py-1.5 text-[11px] text-red-400 hover:bg-red-500/15 transition-all"
+                        className="flex items-center gap-1 bg-red-500/10 border border-red-500/15 rounded-lg px-2.5 py-1.5 text-[11px] text-red-400 hover:bg-red-500/15 transition-all"
                       >
                         <Trash2 size={11} /> Delete
                       </button>
@@ -596,43 +637,40 @@ function AdminDashboardContent() {
               <h2 className="text-base font-semibold text-white mb-5">Platform analytics</h2>
 
               {/* Category breakdown */}
-              <div className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-5 mb-5">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-5 mb-5">
                 <h3 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-4">Problems by category</h3>
                 <div className="space-y-3">
-                  {[
-                    { label: 'Technology', count: 421, pct: 33 },
-                    { label: 'Business', count: 359, pct: 28 },
-                    { label: 'Healthcare', count: 230, pct: 18 },
-                    { label: 'Education', count: 179, pct: 14 },
-                    { label: 'Social', count: 95, pct: 7 },
-                  ].map((cat) => (
-                    <div key={cat.label} className="flex items-center gap-3">
-                      <span className="text-xs text-slate-400 w-20 shrink-0">{cat.label}</span>
-                      <div className="flex-1 h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                  {analyticsCategories.map((cat) => (
+                    <div key={cat.name} className="flex items-center gap-3">
+                      <span className="text-xs text-slate-400 w-20 shrink-0">{cat.name}</span>
+                      <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{
-                            width: `${cat.pct}%`,
-                            background: CATEGORY_COLORS[cat.label as keyof typeof CATEGORY_COLORS] || '#6366F1',
+                            width: `${cat.percent}%`,
+                            background: CATEGORY_COLORS[cat.name as keyof typeof CATEGORY_COLORS] || '#6366F1',
                           }}
                         />
                       </div>
                       <span className="text-xs text-slate-400 w-10 text-right shrink-0">{cat.count}</span>
-                      <span className="text-[10px] text-slate-600 w-8 text-right shrink-0">{cat.pct}%</span>
+                      <span className="text-[10px] text-slate-600 w-8 text-right shrink-0">{cat.percent}%</span>
                     </div>
                   ))}
+                  {analyticsCategories.length === 0 && (
+                    <div className="text-sm text-slate-500 py-4 text-center">No category data available</div>
+                  )}
                 </div>
               </div>
 
               {/* Quick stats grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Claim rate', value: '38%', sub: 'problems get claimed', color: '#6366F1' },
-                  { label: 'Solve rate', value: '61%', sub: 'of claimed get solved', color: '#10B981' },
-                  { label: 'Avg cluster size', value: '5.2', sub: 'problems per cluster', color: '#06B6D4' },
-                  { label: 'Growth this week', value: '+24%', sub: 'more submissions', color: '#F59E0B' },
+                  { label: 'Claim rate', value: `${analyticsStats.claimRate || 0}%`, sub: 'problems get claimed', color: '#6366F1' },
+                  { label: 'Solve rate', value: `${analyticsStats.solveRate || 0}%`, sub: 'of claimed get solved', color: '#10B981' },
+                  { label: 'Avg cluster size', value: (analyticsStats.avgClusterSize || 0).toFixed(1), sub: 'problems per cluster', color: '#06B6D4' },
+                  { label: 'Growth this week', value: `${(analyticsStats.growthPct || 0) > 0 ? '+' : ''}${analyticsStats.growthPct || 0}%`, sub: 'more submissions', color: '#F59E0B' },
                 ].map((s) => (
-                  <div key={s.label} className="bg-white/[0.03] border border-white/[0.07] rounded-xl p-4">
+                  <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <div className="text-xs text-slate-500 mb-1">{s.label}</div>
                     <div className="text-2xl font-semibold mb-0.5" style={{ color: s.color }}>{s.value}</div>
                     <div className="text-[10px] text-slate-600">{s.sub}</div>
@@ -650,7 +688,7 @@ function AdminDashboardContent() {
           className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setConfirmAction(null) }}
         >
-          <div className="w-full max-w-sm bg-[#111118] border border-white/[0.1] rounded-2xl p-6">
+          <div className="w-full max-w-sm bg-[#111118] border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 mx-auto mb-4">
               <AlertTriangle size={20} className="text-red-400" />
             </div>
