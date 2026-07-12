@@ -54,7 +54,7 @@ export default function ValidatePage() {
     setError("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http:
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL:
       const res = await fetch(`${apiUrl}/api/problems/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
