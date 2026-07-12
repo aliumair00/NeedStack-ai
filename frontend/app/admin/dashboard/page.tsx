@@ -125,21 +125,21 @@ function AdminDashboardContent() {
     }
   }, [router, fetchAdminData])
 
-  // Users tab filtered
+  
   const filteredUsers = useMemo(() => {
     if (!userSearch.trim()) return users
     const q = userSearch.toLowerCase()
     return users.filter((u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
   }, [users, userSearch])
 
-  // Developers tab filtered
+  
   const filteredDevs = useMemo(() => {
     let devs = [...developers]
     if (devFilter !== 'all') devs = devs.filter((d) => d.status === devFilter)
     return devs
   }, [developers, devFilter])
 
-  // Clusters filtered
+  
   const filteredClusters = useMemo(() => {
     if (!clusterSearch.trim()) return clusters
     const q = clusterSearch.toLowerCase()
@@ -234,7 +234,7 @@ function AdminDashboardContent() {
       />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen">
-        {/* Header */}
+        {}
         <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-1 md:gap-3 flex-wrap">
             <button 
@@ -265,10 +265,10 @@ function AdminDashboardContent() {
 
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
-          {/* ── OVERVIEW TAB ── */}
+          {}
           {tab === 'overview' && (
             <>
-              {/* Stats grid */}
+              {}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {[
                   { label: 'Total users', value: stats.totalUsers, color: '#F8FAFC', icon: <Users size={14} /> },
@@ -291,7 +291,7 @@ function AdminDashboardContent() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Pending approvals */}
+                {}
                 {pendingDevs.length > 0 && (
                   <div>
                     <h2 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -334,7 +334,7 @@ function AdminDashboardContent() {
                   </div>
                 )}
 
-                {/* Recent activity */}
+                {}
                 <div>
                   <h2 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <Activity size={12} />
@@ -359,7 +359,7 @@ function AdminDashboardContent() {
             </>
           )}
 
-          {/* ── USERS TAB ── */}
+          {}
           {tab === 'users' && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -377,7 +377,7 @@ function AdminDashboardContent() {
               </div>
 
               <div className="bg-white/5 border border-white/5 rounded-xl overflow-hidden">
-                {/* Table header */}
+                {}
                 <div className="grid grid-cols-[1.5fr_1.5fr_80px_120px_80px_120px] gap-3 px-4 py-2.5 border-b border-white/5 text-[10px] text-slate-500 uppercase tracking-wider">
                   <span>User</span>
                   <span>Email</span>
@@ -436,7 +436,7 @@ function AdminDashboardContent() {
             </>
           )}
 
-          {/* ── DEVELOPERS TAB ── */}
+          {}
           {tab === 'developers' && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -551,7 +551,7 @@ function AdminDashboardContent() {
             </>
           )}
 
-          {/* ── CLUSTERS TAB ── */}
+          {}
           {tab === 'clusters' && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -631,12 +631,12 @@ function AdminDashboardContent() {
             </>
           )}
 
-          {/* ── ANALYTICS TAB ── */}
+          {}
           {tab === 'analytics' && (
             <>
               <h2 className="text-base font-semibold text-white mb-5">Platform analytics</h2>
 
-              {/* Category breakdown */}
+              {}
               <div className="bg-white/5 border border-white/10 rounded-xl p-5 mb-5">
                 <h3 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-4">Problems by category</h3>
                 <div className="space-y-3">
@@ -662,7 +662,7 @@ function AdminDashboardContent() {
                 </div>
               </div>
 
-              {/* Quick stats grid */}
+              {}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { label: 'Claim rate', value: `${analyticsStats.claimRate || 0}%`, sub: 'problems get claimed', color: '#6366F1' },
@@ -682,7 +682,7 @@ function AdminDashboardContent() {
         </div>
       </main>
 
-      {/* Confirm Action Modal */}
+      {}
       {confirmAction && (
         <div
           className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4"

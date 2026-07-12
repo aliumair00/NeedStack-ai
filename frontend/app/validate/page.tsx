@@ -54,7 +54,7 @@ export default function ValidatePage() {
     setError("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http:
       const res = await fetch(`${apiUrl}/api/problems/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,7 +129,7 @@ export default function ValidatePage() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-white flex flex-col">
-      {/* TopNavBar */}
+      {}
       <header className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full sticky z-50 bg-[#050507]/80 backdrop-blur-xl border-b border-white/10 top-0 relative">
         <div className="font-headline-md text-headline-md font-bold text-white flex items-center gap-1 after:content-[''] after:w-2 after:h-2 after:bg-primary after:rounded-full after:shadow-[0_0_10px_#6366F1]">
           <Link href="/">Needstack AI</Link>
@@ -155,7 +155,7 @@ export default function ValidatePage() {
       </header>
 
       <main className="flex-grow flex flex-col items-center px-4 py-16 max-w-4xl mx-auto w-full">
-        {/* Header */}
+        {}
         <div className="text-center mb-12">
           <h1 className="font-headline-xl text-headline-xl mb-4">Idea Validator</h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">
@@ -163,7 +163,7 @@ export default function ValidatePage() {
           </p>
         </div>
 
-        {/* Main Input Card */}
+        {}
         <div className="glass-card w-full max-w-[700px] rounded-2xl p-8 mb-12 border border-white/10 shadow-2xl">
           <form onSubmit={handleValidate} className="flex flex-col gap-6">
             {error && (
@@ -221,7 +221,7 @@ export default function ValidatePage() {
           </form>
         </div>
 
-        {/* Loading skeleton */}
+        {}
         {isLoading && (
           <div className="w-full space-y-6 animate-pulse">
             <div className="h-10 bg-white/5 rounded-lg w-2/3 mx-auto"></div>
@@ -234,10 +234,10 @@ export default function ValidatePage() {
           </div>
         )}
 
-        {/* Results Section */}
+        {}
         {hasValidated && validationResult && (
           <div className="w-full space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Predicted Category */}
+            {}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-3">
                 <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest text-xs">
@@ -252,7 +252,7 @@ export default function ValidatePage() {
               </div>
             </div>
 
-            {/* Similarity Clusters */}
+            {}
             <div className="space-y-4">
               <h3 className="font-headline-md text-headline-md">Top Similar Clusters</h3>
               
@@ -289,7 +289,7 @@ export default function ValidatePage() {
               )}
             </div>
 
-            {/* Verdict Banner */}
+            {}
             {(() => {
               const config = getVerdictConfig(validationResult.verdict);
               return (
@@ -312,7 +312,7 @@ export default function ValidatePage() {
               );
             })()}
 
-            {/* CTA */}
+            {}
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href={getFeedLink()} className="w-full sm:w-auto">
                 <button className="px-8 py-3 rounded-xl border border-primary text-primary hover:bg-primary/10 font-label-md font-bold transition-all cursor-pointer w-full text-center">

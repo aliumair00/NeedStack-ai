@@ -25,7 +25,7 @@ async def connect_to_mongo():
     print("\n[INFO] Connecting to MongoDB Atlas...")
     try:
         client = AsyncIOMotorClient(MONGODB_URI, serverSelectionTimeoutMS=5000, tlsAllowInvalidCertificates=True)
-        # Ping the server to confirm the connection is alive
+                                                            
         await client.admin.command("ping")
         db_name = MONGODB_URI.split("/")[-1].split("?")[0] or "needstack"
         db = client[db_name]

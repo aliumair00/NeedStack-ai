@@ -14,7 +14,7 @@ export default function LandingPage() {
   const [activeClusters, setActiveClusters] = useState("1,203");
   const [claimsToday, setClaimsToday] = useState("94");
 
-  // Load auth state and fetch stats
+  
   useEffect(() => {
     const auth = localStorage.getItem("is_authenticated");
     const userRole = localStorage.getItem("user_role");
@@ -33,8 +33,8 @@ export default function LandingPage() {
           const data = await res.json();
           setTotalProblems(data.totalProblems);
           setActiveClusters(data.activeClusters);
-          // Calculate dynamic claims (mocked based on actual claimed clusters in DB)
-          // We can use a simple formula or fetch claims
+          
+          
           setClaimsToday(data.trendingCategories);
         }
       } catch (err) {
@@ -120,7 +120,7 @@ export default function LandingPage() {
     };
   }, []);
 
-  // Determine feed route based on role
+  
   const getFeedRoute = () => {
     if (isAuthenticated) {
       if (role === "developer") return "/developer/dashboard";
@@ -136,7 +136,7 @@ export default function LandingPage() {
 
   return (
     <>
-      {/* TopNavBar */}
+      {}
       <nav className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full sticky top-0 z-50 bg-[#050507]/80 backdrop-blur-xl border-b border-white/10 relative">
         <div className="font-headline-md text-headline-md font-bold text-white flex items-center gap-1 after:content-[''] after:w-2 after:h-2 after:bg-primary after:rounded-full after:shadow-[0_0_10px_#6366F1]">
           Needstack AI
@@ -196,7 +196,7 @@ export default function LandingPage() {
           </button>
         </div>
         
-        {/* Mobile dropdown */}
+        {}
         {mobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-[#050507]/95 backdrop-blur-xl border-b border-white/10 flex flex-col p-6 space-y-4 md:hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             <Link
@@ -258,7 +258,7 @@ export default function LandingPage() {
       </nav>
 
       <main className="flex-grow">
-        {/* Hero Section */}
+        {}
         <section className="relative min-h-[870px] flex flex-col items-center justify-center text-center px-margin-mobile md:px-margin-desktop overflow-hidden">
           <canvas ref={canvasRef} id="network" className="absolute top-0 left-0 w-full h-full z-0 opacity-40 pointer-events-none" />
           <div className="hero-glow -top-20 -left-20"></div>
@@ -293,7 +293,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Stats Bar */}
+        {}
         <section className="px-margin-mobile md:px-margin-desktop -mt-12 mb-24 relative z-20">
           <div className="max-w-container-max mx-auto glass-card rounded-2xl p-8 border border-white/10 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10 text-center">
             <div className="flex-1 py-4 md:py-0 flex flex-col gap-1">
@@ -311,7 +311,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How It Works Section */}
+        {}
         <section className="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest/50 relative overflow-hidden">
           <div className="max-w-container-max mx-auto">
             <div className="text-center mb-16 space-y-4">
@@ -319,14 +319,14 @@ export default function LandingPage() {
               <p className="font-body-md text-body-md text-on-surface-variant">Converting chaos into structured intelligence in three steps.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter relative">
-              {/* Connectors (Desktop) */}
+              {}
               <div className="hidden md:block absolute top-1/2 left-[30%] w-[10%] h-[1px] bg-gradient-to-r from-primary to-transparent -translate-y-1/2">
                 <span className="material-symbols-outlined absolute right-0 -top-3 text-primary">chevron_right</span>
               </div>
               <div className="hidden md:block absolute top-1/2 left-[63%] w-[10%] h-[1px] bg-gradient-to-r from-primary to-transparent -translate-y-1/2">
                 <span className="material-symbols-outlined absolute right-0 -top-3 text-primary">chevron_right</span>
               </div>
-              {/* Step 1 */}
+              {}
               <div className="glass-card p-10 rounded-2xl border border-white/5 flex flex-col items-center text-center space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                   <span className="material-symbols-outlined text-primary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>add_comment</span>
@@ -336,7 +336,7 @@ export default function LandingPage() {
                   Anyone describes their daily friction or unresolved technical problem in natural language.
                 </p>
               </div>
-              {/* Step 2 */}
+              {}
               <div className="glass-card p-10 rounded-2xl border border-white/5 flex flex-col items-center text-center space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-[#06B6D4]/10 border border-[#06B6D4]/20 flex items-center justify-center">
                   <span className="material-symbols-outlined text-[#06B6D4] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>hub</span>
@@ -346,7 +346,7 @@ export default function LandingPage() {
                   Semantic deduplication groups identical problems, surfacing real-world demand clusters.
                 </p>
               </div>
-              {/* Step 3 */}
+              {}
               <div className="glass-card p-10 rounded-2xl border border-white/5 flex flex-col items-center text-center space-y-6">
                 <div className="w-16 h-16 rounded-2xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center">
                   <span className="material-symbols-outlined text-tertiary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>rocket_launch</span>
@@ -360,7 +360,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {}
         <section className="px-margin-mobile md:px-margin-desktop py-24">
           <div className="max-w-container-max mx-auto glass-card rounded-2xl md:rounded-[32px] border border-white/10 p-6 md:p-20 relative overflow-hidden flex flex-col items-center text-center">
             <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -387,7 +387,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Footer */}
+      {}
       <footer className="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-12 w-full mt-auto bg-surface-container-lowest border-t border-white/5">
         <div className="flex flex-col gap-4 mb-8 md:mb-0">
           <div className="font-headline-md text-headline-md font-bold text-white">Needstack AI</div>

@@ -32,7 +32,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
     if (initialConvId && open) {
       let conv = localConvs.find((c) => c.id === initialConvId) || null
       if (!conv && initialConvId.includes('_')) {
-        // Create a temporary conversation object
+        
         const [clusterId, otherUserId] = initialConvId.split('_')
         conv = {
           id: initialConvId,
@@ -74,7 +74,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
               })),
             }
           })
-          // Notify parent that messages have been read
+          
           if (onRead) onRead(activeConv.id)
         } catch (err) {
           console.error('Failed to fetch messages:', err)
@@ -84,7 +84,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
     }
   }, [activeConv?.id, open])
 
-  // Native WebSocket for Real-time Chat
+  
   useEffect(() => {
     if (!open) return
 
@@ -102,12 +102,12 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data)
-          // msg format: { id, senderId, receiverId, clusterId, content, time, isMe }
+          
           
           const convId = `${msg.clusterId}_${msg.senderId}`
           const isCurrentlyActive = activeConvIdRef.current === convId
           
-          // 1. Update active conversation if it matches
+          
           setActiveConv((prev) => {
             if (prev && prev.id === convId) {
               return {
@@ -118,7 +118,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
             return prev
           })
 
-          // 2. Update conversation list
+          
           setLocalConvs((prev) => {
             const exists = prev.find(c => c.id === convId)
             if (exists) {
@@ -132,11 +132,11 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
                     }
                   : c
               )
-              // Move to top
+              
               updated.sort((a, b) => a.id === convId ? -1 : (b.id === convId ? 1 : 0))
               return updated
             }
-            // If it doesn't exist, we might need to fetch it (simplified for now)
+            
             return prev
           })
 
@@ -171,7 +171,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
 
     const [clusterId, otherUserId] = activeConv.id.split('_')
     
-    // Create optimistic message
+    
     const tempId = 'temp_' + Date.now();
     const optimisticMsg: Message = {
       id: tempId,
@@ -202,7 +202,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
         content: contentToSend,
       })
 
-      // Replace optimistic message with real message
+      
       setActiveConv((prev) => {
         if (!prev) return null
         return {
@@ -232,7 +232,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
 
     } catch (err) {
       console.error('Failed to send message:', err)
-      // Remove optimistic message if failed
+      
       setActiveConv((prev) => {
         if (!prev) return null
         return {
@@ -247,16 +247,16 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
 
   return (
     <>
-      {/* Backdrop */}
+      {}
       <div
         className="fixed inset-0 bg-black/40 z-40"
         onClick={onClose}
       />
 
-      {/* Panel */}
+      {}
       <div className="fixed right-0 top-0 h-full w-full sm:w-[380px] bg-[#0D0D15] border-l border-white/10 z-50 flex flex-col">
 
-        {/* Header */}
+        {}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/5">
           {activeConv && (
             <button onClick={() => setActiveConv(null)} className="text-slate-500 hover:text-slate-300 transition-colors">
@@ -276,7 +276,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
           </button>
         </div>
 
-        {/* Conversation List */}
+        {}
         {!activeConv && (
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             {localConvs.length === 0 ? (
@@ -313,10 +313,10 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
           </div>
         )}
 
-        {/* Chat Thread */}
+        {}
         {activeConv && (
           <div className="flex-1 flex flex-col min-h-0 bg-[#0A0A0F] relative">
-            {/* Background Pattern */}
+            {}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
             
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 z-10 scrollbar-hide">

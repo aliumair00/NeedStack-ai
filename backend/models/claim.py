@@ -8,7 +8,7 @@ class ClaimModel(MongoBaseModel):
     developer_id: str
     cluster_id: str
     note: Optional[str] = None
-    progress_status: str # "in_progress" | "testing" | "solved"
+    progress_status: str                                       
     claimed_at: datetime
     updated_at: datetime
 

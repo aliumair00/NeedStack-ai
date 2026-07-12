@@ -10,9 +10,9 @@ function UserSettingsContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState('Ali Hassan')
   const [userEmail, setUserEmail] = useState('user@needstack.com')
-  const [unreadMessages, setUnreadMessages] = useState(0) // Mocked for now
+  const [unreadMessages, setUnreadMessages] = useState(0) 
 
-  // Form states
+  
   const [nameInput, setNameInput] = useState('')
   const [emailInput, setEmailInput] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -57,7 +57,7 @@ function UserSettingsContent() {
     setIsSaving(true)
     setSaveSuccess(false)
     
-    // Simulate API call to save settings
+    
     setTimeout(() => {
       setIsSaving(false)
       setSaveSuccess(true)
@@ -206,7 +206,7 @@ function UserSettingsContent() {
               </div>
             </section>
 
-            {/* Save Actions */}
+            {}
             <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/5">
               {saveSuccess && (
                 <div className="flex items-center gap-2 text-emerald-400 text-sm">

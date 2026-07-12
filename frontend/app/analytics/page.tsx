@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
   const [downloadClicked, setDownloadClicked] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
-  // Dynamic States from Backend
+  
   const [statCards, setStatCards] = useState<StatCard[]>([
     { label: "Total Problems", value: "...", hasShimmer: true },
     { label: "Active Clusters", value: "..." },
@@ -66,7 +66,7 @@ export default function AnalyticsPage() {
   const [weeklyData, setWeeklyData] = useState<WeeklyDataPoint[]>([]);
   const [clusterDots, setClusterDots] = useState<ClusterDot[]>([]);
 
-  // Route Guard
+  
   useEffect(() => {
     const auth = localStorage.getItem("is_authenticated");
     const role = localStorage.getItem("user_role");
@@ -80,11 +80,11 @@ export default function AnalyticsPage() {
     }
   }, [router]);
 
-  // Fetch all analytics data
+  
   const fetchAnalyticsData = useCallback(async () => {
     if (!isAuthenticated) return;
 
-    // 1. Fetch Stats
+    
     try {
       const data = await api.get<{ totalProblems: string, activeClusters: string, totalDevelopers: string, matchRate: string, avgConfidence?: string, trendingCategories?: string }>(`/api/analytics/stats?range=${activeTimeRange}`);
       setStatCards([
@@ -96,7 +96,7 @@ export default function AnalyticsPage() {
       console.warn("Stats fetch failed:", err);
     }
 
-    // 2. Fetch Category Distribution
+    
     try {
       const data = await api.get<{ name: string, percent: number }[]>(`/api/analytics/categories?range=${activeTimeRange}`);
       const formatted = data.map((c) => {
@@ -113,7 +113,7 @@ export default function AnalyticsPage() {
       console.warn("Categories fetch failed:", err);
     }
 
-    // 3. Fetch Weekly Trends
+    
     try {
       const data = await api.get<WeeklyDataPoint[]>(`/api/analytics/weekly-trends?range=${activeTimeRange}`);
       setWeeklyData(data);
@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
       console.warn("Trends fetch failed:", err);
     }
 
-    // 4. Fetch Cluster t-SNE Map
+    
     try {
       const data = await api.get<{ id: number, top: string, left: string, size: string, label: string, category: string, reportCount: number }[]>("/api/analytics/cluster-map");
       const formatted = data.map((d) => {
@@ -144,12 +144,12 @@ export default function AnalyticsPage() {
     }
   }, [isAuthenticated, activeTimeRange]);
 
-  // Fetch data on mount and when time range changes
+  
   useEffect(() => {
     setTimeout(() => fetchAnalyticsData(), 0);
   }, [fetchAnalyticsData]);
 
-  // Poll every 15 seconds for near-real-time updates
+  
   useEffect(() => {
     if (!isAuthenticated) return;
     const interval = setInterval(fetchAnalyticsData, 15000);
@@ -182,17 +182,17 @@ export default function AnalyticsPage() {
     setTimeout(() => setDownloadClicked(false), 3000);
   };
 
-  // Convert week data to SVG path points
+  
   const weeklyToPoints = (data: WeeklyDataPoint[], key: "healthcare" | "technology" | "business") => {
     if (data.length === 0) return "0,100";
     
-    // Find max value to scale Y axis (0 to 100 range)
+    
     const maxVal = Math.max(...data.map(d => d[key]), 10);
     
     const pts = data.map((d, i) => {
       const x = i * (200 / (data.length - 1));
       const val = d[key];
-      // SVG 0 is at top, so flip Y: height=100. Let's make it scale nicely:
+      
       const y = 90 - (val / maxVal) * 80;
       return `${x},${y}`;
     });
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-white flex flex-col">
-      {/* TopNavBar */}
+      {}
       <header className="bg-[#050507]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 relative">
         <nav className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
           <div className="flex items-center gap-8">
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
       </header>
 
       <main className="flex-grow px-margin-mobile md:px-margin-desktop py-8 max-w-container-max mx-auto w-full">
-        {/* Heading */}
+        {}
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="font-headline-xl text-headline-xl mb-2">Problem Intelligence</h1>
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Stat Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-gutter">
           {statCards.map((card, idx) => (
             <div key={idx} className="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group">
@@ -285,9 +285,9 @@ export default function AnalyticsPage() {
           ))}
         </div>
 
-        {/* Charts Row */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-gutter">
-          {/* Left: Category Distribution */}
+          {}
           <div className="lg:col-span-2 glass-card p-8 border border-white/5 rounded-xl">
             <div className="flex justify-between items-center mb-8">
               <h3 className="font-headline-md text-headline-md">Category Distribution</h3>
@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Right: Weekly Trend */}
+          {}
           <div className="glass-card p-8 border border-white/5 rounded-xl flex flex-col">
             <div className="flex justify-between items-center mb-8">
               <h3 className="font-headline-md text-headline-md">Weekly Trend</h3>
@@ -395,7 +395,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Third Row: Problem Cluster Map */}
+        {}
         <div className="glass-card p-8 border border-white/5 rounded-xl mb-gutter">
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -422,7 +422,7 @@ export default function AnalyticsPage() {
               }}
             ></div>
 
-            {/* Cluster Dots */}
+            {}
             {clusterDots.length === 0 ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary text-4xl animate-spin">progress_activity</span>
@@ -435,11 +435,11 @@ export default function AnalyticsPage() {
                   style={{ top: dot.top, left: dot.left, transform: "translate(-50%, -50%)" }}
                   title={`${dot.category} cluster: ${dot.reportCount} reports`}
                 >
-                  {/* Glow halo behind */}
+                  {}
                   <div className={`absolute inset-[-4px] rounded-full ${dot.glowClass} opacity-60 animate-pulse`} />
-                  {/* Solid dot */}
+                  {}
                   <div className={`relative ${dot.size} rounded-full ${dot.dotClass} ring-1 ring-white/20 hover:ring-2 hover:ring-white transition-all cursor-pointer shadow-lg`} />
-                  {/* Label (always show for labeled clusters, hover for others) */}
+                  {}
                   {dot.label && (
                     <span className="absolute -top-7 left-1/2 -translate-x-1/2 text-[9px] text-[#A0E9FF] font-mono whitespace-nowrap bg-black/80 px-2 py-0.5 rounded border border-white/10 shadow-lg opacity-0 group-hover/dot:opacity-100 transition-opacity z-10">
                       {dot.label} ({dot.reportCount} reports)
@@ -461,7 +461,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Bottom Row: Export */}
+        {}
         <div className="flex flex-col md:flex-row gap-gutter">
           <button
             onClick={handleDownload}

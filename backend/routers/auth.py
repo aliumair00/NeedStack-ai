@@ -17,17 +17,17 @@ async def register(user: UserCreate):
     db = get_database()
     print(">>> [DEBUG] got database")
     
-    # Validate uniqueness
+                         
     print(">>> [DEBUG] checking existing user...")
     existing_user = await db.users.find_one({"email": user.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Registration failed. Please check your input or try again.")
         
     if user.role not in ["user", "developer"]:
         raise HTTPException(status_code=400, detail="Invalid role")
         
     print(">>> [DEBUG] hashing password...")
-    # Prepare user doc
+                      
     user_doc = {
         "email": user.email,
         "password_hash": get_password_hash(user.password),
@@ -56,7 +56,7 @@ async def login(user_login: UserLogin):
     admin_email = os.getenv("ADMIN_EMAIL")
     admin_password = os.getenv("ADMIN_PASSWORD")
     
-    # Strip any accidental whitespace from the frontend
+                                                       
     req_email = user_login.email.strip()
     req_password = user_login.password.strip()
     

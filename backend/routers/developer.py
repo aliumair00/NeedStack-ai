@@ -34,7 +34,7 @@ async def get_developer_problems(category: Optional[str] = "All", sort: Optional
     user_id_str = str(current_user["_id"])
     
     for c in clusters:
-        # Get users count
+                         
         user_count = await db.problems.count_documents({"cluster_id": c["_id"]})
         
         claimed_by_name = None
@@ -96,11 +96,11 @@ async def claim_problem(cluster_id: str, req: ClaimRequest, current_user: dict =
     }
     res = await db.claims.insert_one(claim_doc)
     
-    # Notify users & auto-initialize conversation with a system message
+                                                                       
     dev_name = current_user["full_name"].split(" ")[0]
     await notify_users_in_cluster(cluster_id, "claim", f"Developer {dev_name} claimed your problem: {cluster['title']}")
     
-    # Auto-start conversation in db by sending a welcome message
+                                                                
     cursor = db.problems.find({"cluster_id": ObjectId(cluster_id)})
     probs = await cursor.to_list(length=None)
     unique_users = set(str(p["user_id"]) for p in probs)
@@ -115,7 +115,7 @@ async def claim_problem(cluster_id: str, req: ClaimRequest, current_user: dict =
         }
         await db.messages.insert_one(msg)
         
-    # Update developer stats
+                            
     await db.users.update_one({"_id": dev_id}, {"$inc": {"problems_claimed": 1}})
     
     return {"message": "Cluster claimed successfully", "claim_id": str(res.inserted_id)}

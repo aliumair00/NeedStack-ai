@@ -102,7 +102,7 @@ async def approve_developer(id: str, current_user: dict = Depends(get_current_ad
         {"_id": ObjectId(id), "role": "developer"},
         {"$set": {"status": "approved", "approved_at": datetime.utcnow()}}
     )
-    # Optional: create notification
+                                   
     return {"message": "Developer approved"}
 
 @router.patch("/developers/{id}/reject")
@@ -189,7 +189,7 @@ async def get_admin_activity(current_user: dict = Depends(get_current_admin)):
     
     result = []
     for l in logs:
-        # Time ago logic simplified for admin activity feed
+                                                           
         diff = datetime.utcnow() - l["created_at"]
         if diff.days > 0: time_str = f"{diff.days}d ago"
         elif diff.seconds // 3600 > 0: time_str = f"{diff.seconds // 3600}h ago"

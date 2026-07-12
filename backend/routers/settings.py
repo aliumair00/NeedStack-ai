@@ -34,5 +34,5 @@ async def update_settings(update: SettingsUpdate, current_user: dict = Depends(g
     result = await db.users.update_one({"_id": ObjectId(current_user["_id"])}, {"$set": update_data})
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="User not found or no changes applied")
-    # Return the updated fields
+                               
     return {"updated": True, **update_data}

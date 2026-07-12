@@ -24,14 +24,14 @@ def encode_text(text: str) -> list[float]:
     return embedding.tolist()
 
 def calculate_similarity(vec1: list[float], vec2: list[float]) -> float:
-    # reshape to 2D arrays for sklearn
+                                      
     v1 = np.array(vec1).reshape(1, -1)
     v2 = np.array(vec2).reshape(1, -1)
     sim = cosine_similarity(v1, v2)
     return float(sim[0][0])
 
 def update_centroid(old_centroid: list[float], n: int, new_vector: list[float]) -> list[float]:
-    # Running mean: (old_mean * n + new_val) / (n + 1)
+                                                      
     old_np = np.array(old_centroid)
     new_np = np.array(new_vector)
     updated_np = (old_np * n + new_np) / (n + 1)

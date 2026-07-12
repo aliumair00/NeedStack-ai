@@ -41,7 +41,7 @@ function UserDashboardContent() {
   const [activeChatConvId, setActiveChatConvId] = useState<string | null>(null)
   const [expandedProblem, setExpandedProblem] = useState<string | null>(null)
 
-  // Submit form state
+  
   const [problemText, setProblemText] = useState('')
   const [category, setCategory] = useState<ProblemCategory>('Technology')
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
@@ -94,7 +94,7 @@ function UserDashboardContent() {
     }
   }, [])
 
-  // Auth route guard
+  
   useEffect(() => {
   const auth = localStorage.getItem('is_authenticated')
   const role = localStorage.getItem('user_role')
@@ -116,13 +116,13 @@ function UserDashboardContent() {
   }
 }, [router, fetchDashboardData]);
 
-// Poll dashboard data every 15 seconds for near‑real‑time updates
+
 useEffect(() => {
   const interval = setInterval(fetchDashboardData, 15000);
   return () => clearInterval(interval);
 }, [fetchDashboardData]);
 
-  // Sync tab=messages to open chat panel automatically
+  
   useEffect(() => {
     if (currentTab === 'messages') {
       setTimeout(() => setChatOpen(true), 0)
@@ -149,7 +149,7 @@ useEffect(() => {
       })
       setSubmitState(result.isNewCluster ? 'new' : 'matched')
 
-      // Refresh problems list
+      
       const myProbs = await api.get<unknown[]>('/api/problems/my-problems')
       setProblems(myProbs as import('@/lib/mockData').UserProblem[])
     } catch (err) {
@@ -157,7 +157,7 @@ useEffect(() => {
       setSubmitState('idle')
     }
 
-    // Reset form after 4s
+    
     setTimeout(() => {
       setProblemText('')
       setSubmitState('idle')
@@ -196,7 +196,7 @@ useEffect(() => {
       <UserSidebar userName={userName} unreadMessages={unreadMessages} mobileOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen">
-        {/* Topbar */}
+        {}
         <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-3">
             <button 
@@ -229,7 +229,7 @@ useEffect(() => {
 
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
-          {/* Stats - Shown on Overview */}
+          {}
           {(currentTab === 'overview' || currentTab === 'messages') && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {[
@@ -245,7 +245,7 @@ useEffect(() => {
             </div>
           )}
 
-          {/* Submit Problem Section - Shown on Overview or Submit Tab */}
+          {}
           {(currentTab === 'overview' || currentTab === 'submit' || currentTab === 'messages') && (
             <section className="mb-8">
               <h2 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-3">Submit a problem</h2>
@@ -289,7 +289,7 @@ useEffect(() => {
                   </button>
                 </div>
 
-                {/* Submit result */}
+                {}
                 {submitResult && (
                   <div className={`mt-3 flex items-start gap-2.5 px-4 py-3 rounded-lg border ${
                     submitResult.matched
@@ -308,7 +308,7 @@ useEffect(() => {
             </section>
           )}
 
-          {/* My Problems - Shown on Overview or Problems Tab */}
+          {}
           {(currentTab === 'overview' || currentTab === 'problems' || currentTab === 'messages') && (
             <section>
               <div className="flex items-center justify-between mb-3">
@@ -331,7 +331,7 @@ useEffect(() => {
                           <p className="text-sm text-slate-200 leading-relaxed mb-2.5">{problem.text}</p>
 
                           <div className="flex items-center flex-wrap gap-2">
-                            {/* Category badge */}
+                            {}
                             <span
                               className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
                               style={{
@@ -343,7 +343,7 @@ useEffect(() => {
                               {problem.category}
                             </span>
 
-                            {/* Status badge */}
+                            {}
                             <span
                               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border"
                               style={{
@@ -356,18 +356,18 @@ useEffect(() => {
                               {status.label}
                             </span>
 
-                            {/* Similar count */}
+                            {}
                             <span className="text-[11px] text-slate-500">
                               <span className="text-indigo-400 font-medium">{problem.similarCount}</span> similar reports
                             </span>
 
-                            {/* Time */}
+                            {}
                             <span className="text-[10px] text-slate-600 ml-auto">
                               {new Date(problem.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}
                             </span>
                           </div>
 
-                          {/* Developer claimed — show chat button */}
+                          {}
                           {problem.claimedBy && (
                             <div className="mt-3 flex items-center gap-2.5 pt-2.5 border-t border-white/5">
                               <div className="w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center text-[9px] font-semibold text-indigo-300">
@@ -402,7 +402,7 @@ useEffect(() => {
                         </button>
                       </div>
 
-                      {/* Expanded: similar problems from other users */}
+                      {}
                       {isExpanded && (
                         <div className="mt-3 pt-3 border-t border-white/5">
                           <p className="text-[11px] text-slate-500 mb-2">Similar problems from other users</p>
@@ -429,20 +429,20 @@ useEffect(() => {
         </div>
       </main>
 
-      {/* Chat Panel */}
+      {}
       <ChatPanel
         conversations={conversations}
         open={chatOpen}
         onClose={closeChat}
         initialConvId={activeChatConvId}
         onRead={(convId) => {
-          // Optimistically clear unread count in UI
+          
           setConversations((prev) =>
             prev.map((c) =>
               c.id === convId ? { ...c, unreadCount: 0 } : c
             )
           );
-          // Optionally inform backend that messages have been read
+          
           api.patch(`/api/messages/read/${convId.split('_')[0]}/${convId.split('_')[1]}`).catch((err) => {
             console.error('Failed to mark messages as read:', err);
           });

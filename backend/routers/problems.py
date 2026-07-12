@@ -36,7 +36,7 @@ async def submit_problem(problem: ProblemSubmit, current_user: dict = Depends(ge
     db = get_database()
     embedding = encode_text(problem.text)
     
-    # Find matching clusters in the same category
+                                                 
     cursor = db.clusters.find({"category": problem.category})
     clusters = await cursor.to_list(length=100)
     
@@ -54,10 +54,10 @@ async def submit_problem(problem: ProblemSubmit, current_user: dict = Depends(ge
     similar_reports_count = 0
     
     if best_match:
-        # Update existing cluster
+                                 
         cluster_id = best_match["_id"]
         new_centroid = update_centroid(best_match["centroid_embedding"], best_match["report_count"], embedding)
-        similar_reports_count = best_match["report_count"] # before increment
+        similar_reports_count = best_match["report_count"]                   
         
         await db.clusters.update_one(
             {"_id": cluster_id},
@@ -70,14 +70,14 @@ async def submit_problem(problem: ProblemSubmit, current_user: dict = Depends(ge
             }
         )
     else:
-        # Create new cluster
+                            
         is_new_cluster = True
         new_cluster = {
-            "title": problem.text[:60], # naive title generation for now
+            "title": problem.text[:60],                                 
             "category": problem.category,
             "centroid_embedding": embedding,
             "report_count": 1,
-            "confidence_score": 50.0, # default starting confidence
+            "confidence_score": 50.0,                              
             "claim_status": "unclaimed",
             "claimed_by": None,
             "claim_note": None,
@@ -93,7 +93,7 @@ async def submit_problem(problem: ProblemSubmit, current_user: dict = Depends(ge
         cluster_id = result.inserted_id
         similar_reports_count = 0
 
-    # Save problem
+                  
     new_problem = {
         "text": problem.text,
         "category": problem.category,
@@ -106,7 +106,7 @@ async def submit_problem(problem: ProblemSubmit, current_user: dict = Depends(ge
     }
     await db.problems.insert_one(new_problem)
     
-    # Update user stats
+                       
     await db.users.update_one(
         {"_id": ObjectId(current_user["_id"])},
         {"$inc": {"problems_submitted": 1}}
@@ -155,7 +155,7 @@ async def upvote_problem(problem_id: str, current_user: dict = Depends(get_curre
         
     user_id = ObjectId(current_user["_id"])
     if user_id in problem.get("upvoted_by", []):
-        # Already voted
+                       
         return {"votes": problem.get("votes", 0)}
         
     result = await db.problems.find_one_and_update(
@@ -191,7 +191,7 @@ async def get_my_problems(current_user: dict = Depends(get_current_user)):
                     "avatar": dev["full_name"][:2].upper()
                 }
                 
-        # Check unread messages
+                               
         has_unread = False
         unread_msg = await db.messages.find_one({
             "cluster_id": cluster["_id"],
@@ -254,7 +254,7 @@ async def validate_idea(req: ValidateRequest):
     for m in top_matches:
         c = m["cluster"]
         sim_pct = int(m["similarity"] * 100)
-        # Only include if somewhat similar
+                                          
         if sim_pct > 30:
             response_clusters.append({
                 "id": str(c["_id"]),

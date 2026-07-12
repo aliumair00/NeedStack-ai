@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 async def get_stats(range: str = "7d", current_user: dict = Depends(get_current_user)):
     db = get_database()
     
-    # Calculate date filter
+                           
     days = 7 if range == "7d" else (30 if range == "30d" else 90)
     cutoff_date = datetime.utcnow() - timedelta(days=days)
     date_filter = {"created_at": {"$gte": cutoff_date}}
@@ -21,7 +21,7 @@ async def get_stats(range: str = "7d", current_user: dict = Depends(get_current_
     cluster_filter = {"claim_status": {"$ne": "solved"}, "created_at": {"$gte": cutoff_date}}
     active_clusters = await db.clusters.count_documents(cluster_filter)
     
-    # Calculate avg confidence
+                              
     pipeline = [
         {"$match": date_filter},
         {"$group": {"_id": None, "avg_conf": {"$avg": "$confidence_score"}}}
@@ -74,7 +74,7 @@ async def get_categories(range: str = "7d", current_user: dict = Depends(get_cur
 
 @router.get("/weekly-trends")
 async def get_weekly_trends(range: str = "7d", current_user: dict = Depends(get_current_user)):
-    # Return different mocked data based on time range to show interactivity
+                                                                            
     if range == "30d":
         return [
             { "day": "Week 1", "healthcare": 85, "technology": 140, "business": 60 },
@@ -103,7 +103,7 @@ async def get_weekly_trends(range: str = "7d", current_user: dict = Depends(get_
 async def get_cluster_map(current_user: dict = Depends(get_current_user)):
     db = get_database()
     
-    # Ideally we run t-SNE here. For now, we mock the 2D layout.
+                                                                
     cursor = db.clusters.find({}).sort("report_count", -1).limit(30)
     clusters = await cursor.to_list(length=30)
     
@@ -111,7 +111,7 @@ async def get_cluster_map(current_user: dict = Depends(get_current_user)):
     
     response = []
     for c in clusters:
-        # random positions for demo
+                                   
         top = f"{random.randint(10, 90)}%"
         left = f"{random.randint(10, 90)}%"
         

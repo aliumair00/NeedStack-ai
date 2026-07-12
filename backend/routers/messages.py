@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, WebSocket, WebS
 from typing import List, Dict
 from bson import ObjectId
 from datetime import datetime
-from jose import jwt, JWTError
+import jwt
 
 from database.connection import get_database
 from middleware.auth_middleware import get_current_user, SECRET_KEY, ALGORITHM
@@ -11,7 +11,7 @@ from services.notification_service import create_notification
 
 class ConnectionManager:
     def __init__(self):
-        # Maps user_id (str) to WebSocket
+                                         
         self.active_connections: Dict[str, WebSocket] = {}
 
     async def connect(self, websocket: WebSocket, user_id: str):
@@ -113,9 +113,9 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
 async def get_messages(cluster_id: str, other_user_id: str, current_user: dict = Depends(get_current_user)):
     db = get_database()
     user_id = ObjectId(current_user["_id"])
-    # If other_user_id is "temp", this is a temporary conversation, return empty list
+                                                                                     
     if other_user_id == "temp":
-        # Validate cluster_id is a proper ObjectId
+                                                  
         try:
             ObjectId(cluster_id)
         except Exception:
@@ -123,7 +123,7 @@ async def get_messages(cluster_id: str, other_user_id: str, current_user: dict =
         return []
     other_id = ObjectId(other_user_id)
     c_id = ObjectId(cluster_id)
-    # Mark read
+               
     await db.messages.update_many(
         {
             "cluster_id": c_id,
@@ -145,9 +145,9 @@ async def get_messages(cluster_id: str, other_user_id: str, current_user: dict =
     messages = await cursor.to_list(length=1000)
     
     result = []
-    # Handle temporary conversation where other_user_id might be 'temp'
+                                                                       
     if other_user_id == "temp":
-        # Return empty list for temporary conversations
+                                                       
         return []
     for m in messages:
         is_me = m["sender_id"] == user_id
@@ -172,14 +172,14 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
         if user_id is None:
             await websocket.close(code=1008)
             return
-    except JWTError:
+    except jwt.InvalidTokenError:
         await websocket.close(code=1008)
         return
         
     await manager.connect(websocket, user_id)
     try:
         while True:
-            # Wait for any incoming message to keep connection open (ping/pong)
+                                                                               
             data = await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(user_id)
@@ -203,7 +203,7 @@ async def send_message(req: MessageSendRequest, current_user: dict = Depends(get
     
     res = await db.messages.insert_one(msg)
     
-    # Broadcast to receiver via WebSocket
+                                         
     msg_dict = {
         "id": str(res.inserted_id),
         "senderId": str(user_id),
@@ -215,7 +215,7 @@ async def send_message(req: MessageSendRequest, current_user: dict = Depends(get
     }
     await manager.send_personal_message(msg_dict, str(receiver_id))
     
-    # Notify
+            
     sender_name = current_user["full_name"].split(" ")[0]
     await create_notification(str(receiver_id), "message", f"{sender_name} sent you a message", str(cluster_id))
     

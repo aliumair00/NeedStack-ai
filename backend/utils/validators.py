@@ -8,5 +8,5 @@ def sanitize_text(v: str) -> str:
         return html.escape(v)
     return v
 
-# Annotated type for safe text fields
+                                     
 SafeStr = Annotated[str, BeforeValidator(sanitize_text)]

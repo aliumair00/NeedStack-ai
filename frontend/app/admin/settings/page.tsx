@@ -13,7 +13,7 @@ export default function AdminSettingsPage() {
   const [totalUsers, setTotalUsers] = useState(0)
   const [adminEmail, setAdminEmail] = useState('admin@needstack.ai')
 
-  // Form states
+  
   const [siteName, setSiteName] = useState('Needstack AI')
   const [contactEmail, setContactEmail] = useState('support@needstack.ai')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -39,7 +39,7 @@ export default function AdminSettingsPage() {
         if (email) setAdminEmail(email)
       }, 0)
       
-      // Fetch sidebar stats
+      
       api.get<Record<string, number>>('/api/admin/stats')
         .then(data => {
           setTotalUsers(data.totalUsers || 0)
@@ -53,7 +53,7 @@ export default function AdminSettingsPage() {
     setIsSaving(true)
     setSaveSuccess(false)
     
-    // Simulate API call to save settings
+    
     setTimeout(() => {
       setIsSaving(false)
       setSaveSuccess(true)
@@ -163,7 +163,7 @@ export default function AdminSettingsPage() {
               </div>
             </section>
 
-            {/* Security Section */}
+            {}
             <section className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
@@ -198,7 +198,7 @@ export default function AdminSettingsPage() {
               </div>
             </section>
 
-            {/* Save Actions */}
+            {}
             <div className="flex items-center justify-end gap-4 pt-4 border-t border-white/5">
               {saveSuccess && (
                 <div className="flex items-center gap-2 text-emerald-400 text-sm">

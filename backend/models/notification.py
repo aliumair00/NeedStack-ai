@@ -4,7 +4,7 @@ from .base import MongoBaseModel
 
 class NotificationModel(MongoBaseModel):
     user_id: str
-    type: str # "claim" | "similar" | "message" | "solved" | "approval"
+    type: str                                                          
     message: str
     is_read: bool = False
     cluster_id: Optional[str] = None

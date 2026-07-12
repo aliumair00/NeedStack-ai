@@ -1,7 +1,7 @@
 import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
+import jwt
 from pydantic import BaseModel
 from typing import Optional
 from database.connection import get_database
@@ -33,7 +33,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user_id is None:
             raise credentials_exception
         token_data = TokenData(user_id=user_id, role=role)
-    except JWTError:
+    except jwt.InvalidTokenError:
         raise credentials_exception
         
     if token_data.role == "admin":

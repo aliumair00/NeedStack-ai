@@ -59,7 +59,7 @@ export default function UserSidebar({ userName, unreadMessages, mobileOpen, onCl
 
   return (
     <>
-      {/* Mobile backdrop */}
+      {}
       {mobileOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
@@ -71,13 +71,13 @@ export default function UserSidebar({ userName, unreadMessages, mobileOpen, onCl
         transition-transform duration-300 ease-in-out md:relative md:translate-x-0
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Logo */}
+        {}
       <div className="flex items-center gap-2 px-5 py-5 border-b border-white/5">
         <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_6px_#6366F1]" />
         <span className="text-white font-semibold text-sm tracking-tight">Needstack AI</span>
       </div>
 
-      {/* Nav */}
+      {}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map((item) => {
           const isActive = item.key ? currentTab === item.key : pathname === item.href
@@ -120,7 +120,7 @@ export default function UserSidebar({ userName, unreadMessages, mobileOpen, onCl
         ))}
       </nav>
 
-      {/* User info + logout */}
+      {}
       <div className="p-3 border-t border-white/5">
         <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg">
           <div className="w-7 h-7 rounded-full bg-indigo-500/25 flex items-center justify-center text-[11px] font-semibold text-indigo-300 shrink-0">

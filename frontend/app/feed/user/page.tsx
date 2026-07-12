@@ -30,7 +30,7 @@ function UserFeedContent() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [isLoadingFeed, setIsLoadingFeed] = useState(true);
 
-  // Authentication Route Guard & Redirect to dashboard
+  
   useEffect(() => {
     const auth = localStorage.getItem("is_authenticated");
     const role = localStorage.getItem("user_role");
@@ -49,7 +49,7 @@ function UserFeedContent() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
 
-  // Fetch Feed Data from API
+  
   const fetchFeed = async (categoryFilter = "All") => {
     setIsLoadingFeed(true);
     try {
@@ -84,7 +84,7 @@ function UserFeedContent() {
     }
   }, [searchParams]);
 
-  // Upvote Problem in API
+  
   const handleUserUpvote = async (id: number) => {
     try {
       const res = await fetch(`${apiUrl}/api/problems/upvote/${id}`, {
@@ -100,7 +100,7 @@ function UserFeedContent() {
     }
   };
 
-  // Submit Problem Statement to API
+  
   const handleSubmitProblem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!problemText || selectedCategory === "Select Category") return;
@@ -118,18 +118,18 @@ function UserFeedContent() {
       if (res && res.ok) {
         const result = await res.json();
         
-        // Show success hint and reports count
+        
         setSuccessSimilarCount(result.similarReportsCount);
         setShowSubmissionSuccess(true);
         
-        // Reset form
+        
         setProblemText("");
         setSelectedCategory("Select Category");
         
-        // Reload feed to show new submission
+        
         fetchFeed(activeFilter);
 
-        // Hide success alert after 6 seconds
+        
         setTimeout(() => {
           setShowSubmissionSuccess(false);
         }, 6000);
@@ -154,7 +154,7 @@ function UserFeedContent() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-white flex flex-col">
-      {/* TopNavBar */}
+      {}
       <nav className="w-full sticky top-0 z-50 bg-[#050507]/80 backdrop-blur-xl border-b border-white/10">
         <div className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full max-w-container-max mx-auto">
           <Link href="/" className="font-headline-md text-headline-md font-bold text-primary flex items-center gap-1 after:content-[''] after:w-2 after:h-2 after:bg-primary after:rounded-full after:shadow-[0_0_10px_#6366F1]">
@@ -185,10 +185,10 @@ function UserFeedContent() {
         </div>
       </nav>
 
-      {/* Main Container */}
+      {}
       <main className="flex-grow w-full max-w-[800px] mx-auto px-margin-mobile md:px-0 py-10 space-y-10">
         
-        {/* Header Title */}
+        {}
         <div className="text-center space-y-2">
           <h1 className="font-headline-xl text-headline-xl">Voice Your Problem</h1>
           <p className="text-on-surface-variant font-body-md">
@@ -196,7 +196,7 @@ function UserFeedContent() {
           </p>
         </div>
 
-        {/* Submission Section */}
+        {}
         <section className="space-y-4" id="submission-container">
           <div className="glass-card rounded-xl p-6 border border-white/10 shadow-lg overflow-hidden">
             <div
@@ -259,7 +259,7 @@ function UserFeedContent() {
                 </div>
               </form>
 
-              {/* Success State Hint */}
+              {}
               {showSubmissionSuccess && (
                 <div className="bg-secondary/15 border border-secondary/30 rounded-lg py-3.5 px-4 flex items-center gap-3 animate-in fade-in duration-300">
                   <span className="material-symbols-outlined text-secondary text-lg">check_circle</span>
@@ -272,7 +272,7 @@ function UserFeedContent() {
           </div>
         </section>
 
-        {/* Filter Section */}
+        {}
         <section className="overflow-x-auto pb-2 scrollbar-hide">
           <div className="flex gap-3">
             {["All", "Healthcare", "Education", "Business", "Technology", "Social"].map((cat) => (
@@ -291,7 +291,7 @@ function UserFeedContent() {
           </div>
         </section>
 
-        {/* Problem Feed */}
+        {}
         <section className="space-y-6">
           {isLoadingFeed ? (
             <div className="py-12 flex justify-center">
@@ -305,7 +305,7 @@ function UserFeedContent() {
             userFeedItems.map((item) => (
               <div key={item.id} className="glass-card rounded-xl p-6 border border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-0.5">
                 <div className="flex gap-6">
-                  {/* Voting */}
+                  {}
                   <div className="flex flex-col items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleUserUpvote(item.id)}

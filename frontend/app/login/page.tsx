@@ -117,12 +117,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-on-surface flex items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden">
-      {/* Background visual decorations */}
+      {}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/15 blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-[450px] z-10 space-y-6">
-        {/* Logo */}
+        {}
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <div className="w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_10px_#8083ff]" />
           <span className="text-white font-headline-md text-headline-md tracking-tight font-bold">Needstack AI</span>
@@ -132,7 +132,7 @@ export default function LoginPage() {
           <h1 className="font-headline-lg text-headline-lg text-white mb-1">Welcome back</h1>
           <p className="text-on-surface-variant font-body-md text-body-md mb-6">Select your role to continue</p>
 
-          {/* Role Selector */}
+          {}
           <div className="grid grid-cols-3 gap-2 mb-6">
             {roles.map((role) => (
               <button
@@ -220,7 +220,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
+          {}
           <p className="text-center text-label-sm text-on-surface-variant mt-6">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="text-primary hover:underline">

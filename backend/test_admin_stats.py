@@ -1,7 +1,7 @@
 import requests
 
 url = "http://localhost:8000/api/admin/stats"
-# we need an admin token
+                        
 login_url = "http://localhost:8000/api/auth/login"
 payload = {"email": "admin@needstack.ai", "password": "hanan123"}
 try:

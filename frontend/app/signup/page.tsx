@@ -79,7 +79,7 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http:
       const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +98,7 @@ export default function SignupPage() {
         throw new Error(errData.detail || 'Registration failed. Could not connect to API server.')
       }
 
-      setStep(accountType === 'user' ? 3 : 4) // success screens
+      setStep(accountType === 'user' ? 3 : 4) 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       setError(msg);
@@ -107,7 +107,7 @@ export default function SignupPage() {
     }
   }
 
-  // Success screens
+  
   if (step === 3) {
     return <SuccessScreen type="user" onContinue={() => router.push('/user/dashboard')} />
   }
@@ -119,12 +119,12 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-[#050507] text-on-surface flex items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden">
-      {/* Background visual decorations */}
+      {}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/15 blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-md z-10 space-y-6">
-        {/* Logo */}
+        {}
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <div className="w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_10px_#8083ff]" />
           <span className="text-white font-headline-md text-headline-md tracking-tight font-bold">Needstack AI</span>
@@ -134,7 +134,7 @@ export default function SignupPage() {
           <h1 className="font-headline-lg text-headline-lg text-white mb-1">Create account</h1>
           <p className="text-on-surface-variant font-body-md text-body-md mb-6">Join the problem intelligence platform</p>
 
-          {/* Progress Steps */}
+          {}
           <div className="flex items-center gap-2 mb-7">
             {(accountType === 'user' ? ['Account type', 'Your info'] : STEPS).map((label, i) => (
               <div key={i} className="flex items-center gap-2 flex-1 last:flex-none">
@@ -156,7 +156,7 @@ export default function SignupPage() {
             ))}
           </div>
 
-          {/* Step 0 — Account Type */}
+          {}
           {step === 0 && (
             <div className="space-y-3">
               {(['user', 'developer'] as AccountType[]).map((type) => (
@@ -195,7 +195,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Step 1 — Basic Info */}
+          {}
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-1.5">
@@ -247,7 +247,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Step 2 — Developer Extra Info */}
+          {}
           {step === 2 && (
             <div className="space-y-4">
               <div className="space-y-1.5">
@@ -294,7 +294,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Error */}
+          {}
           {error && (
             <div className="flex items-center gap-2 bg-error-container/20 border border-error-container/40 text-error rounded-lg px-3 py-2.5 mt-4">
               <AlertCircle size={15} className="text-error shrink-0" />
@@ -302,7 +302,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Actions */}
+          {}
           <div className="flex gap-2 mt-6">
             {step > 0 && (
               <button
@@ -337,7 +337,7 @@ export default function SignupPage() {
 function SuccessScreen({ type, onContinue }: { type: 'user' | 'developer'; onContinue: () => void }) {
   return (
     <div className="min-h-screen bg-[#050507] text-on-surface flex items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative overflow-hidden">
-      {/* Background visual decorations */}
+      {}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/15 blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none"></div>
 

@@ -157,7 +157,7 @@ function DeveloperDashboardContent() {
     }
   }, [router, fetchProblems, fetchDashboardData])
 
-  // Fetch problems when filters change
+  
   useEffect(() => {
     const auth = localStorage.getItem('is_authenticated')
     const role = localStorage.getItem('user_role')
@@ -206,7 +206,7 @@ function DeveloperDashboardContent() {
   }
 
   const closeChat = () => {
-    // Reset to browse tab if currently on messages
+    
     if (tab === 'messages') {
       setTab('browse')
       router.push('/developer/dashboard')
@@ -248,7 +248,7 @@ function DeveloperDashboardContent() {
       />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen">
-        {/* Topbar */}
+        {}
         <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-1 md:gap-3 flex-wrap">
             <button 
@@ -290,10 +290,10 @@ function DeveloperDashboardContent() {
 
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
 
-          {/* ── BROWSE TAB ── */}
+          {}
           {tab === 'browse' && (
             <>
-              {/* Stats */}
+              {}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                 {[
                   { label: 'Total problems', value: cards.length, color: '#F8FAFC' },
@@ -308,7 +308,7 @@ function DeveloperDashboardContent() {
                 ))}
               </div>
 
-              {/* Filters */}
+              {}
               <div className="flex items-center gap-2 mb-4 flex-wrap">
                 <div className="relative flex-1 min-w-[180px]">
                   <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
@@ -342,7 +342,7 @@ function DeveloperDashboardContent() {
                 </button>
               </div>
 
-              {/* Category pills */}
+              {}
               <div className="flex items-center gap-2 mb-5 flex-wrap">
                 {CATEGORIES.map((cat) => (
                   <button
@@ -359,7 +359,7 @@ function DeveloperDashboardContent() {
                 ))}
               </div>
 
-              {/* Problem Cards Grid */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredCards.map((card) => (
                   <ProblemCardComponent
@@ -378,7 +378,7 @@ function DeveloperDashboardContent() {
             </>
           )}
 
-          {/* ── MY CLAIMS TAB ── */}
+          {}
           {tab === 'claims' && (
             <>
               <div className="mb-5">
@@ -424,15 +424,15 @@ function DeveloperDashboardContent() {
                         <button
                           onClick={async () => {
                             try {
-                              // Find existing conversation for this cluster
+                              
                               const existingConv = conversations.find(c => c.id.startsWith(claim.cardId))
                               if (existingConv) {
                                 handleTabChange('messages')
                                 openChat(existingConv.id)
                               } else {
-                                // Create temporary conversation ID using clusterId and a placeholder user ID
+                                
                                 const tempConvId = `${claim.cardId}_temp`
-                                // Add a placeholder conversation to the state
+                                
                                 setConversations(prev => [...prev, {
                                   id: tempConvId,
                                   userName: 'New User',
@@ -477,7 +477,7 @@ function DeveloperDashboardContent() {
             </>
           )}
 
-          {/* ── MESSAGES TAB ── */}
+          {}
           {tab === 'messages' && (
             <>
               <div className="mb-5">
@@ -515,7 +515,7 @@ function DeveloperDashboardContent() {
         </div>
       </main>
 
-      {/* Claim Modal */}
+      {}
       {claimModalCard && (
         <ClaimModal
           card={claimModalCard}
@@ -524,7 +524,7 @@ function DeveloperDashboardContent() {
         />
       )}
 
-      {/* Dev Chat Panel */}
+      {}
       <DevChatPanel
         conversations={conversations}
         open={chatOpen}
@@ -538,7 +538,7 @@ function DeveloperDashboardContent() {
   )
 }
 
-// ── Problem Card Sub-component ──
+
 function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: () => void }) {
   const [claiming, setClaiming] = useState(false)
 
@@ -559,7 +559,7 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
 
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/15 transition-all flex flex-col">
-      {/* Top row */}
+      {}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
           <span
@@ -577,10 +577,10 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
         <ConfidenceRing score={card.confidenceScore} size={34} />
       </div>
 
-      {/* Title */}
+      {}
       <h3 className="text-sm font-semibold text-white leading-snug mb-2">{card.title}</h3>
 
-      {/* Report count */}
+      {}
       <div className="flex items-baseline gap-1 mb-3">
         <span className="text-2xl font-bold text-indigo-400">{card.reportCount}</span>
         <span className="text-xs text-slate-500">reports</span>
@@ -589,7 +589,7 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
         )}
       </div>
 
-      {/* Keywords */}
+      {}
       <div className="flex flex-wrap gap-1.5 mb-4">
         {card.keywords.map((kw) => (
           <span key={kw} className="bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-slate-500 font-mono">
@@ -598,7 +598,7 @@ function ProblemCardComponent({ card, onClaim }: { card: ProblemCard; onClaim: (
         ))}
       </div>
 
-      {/* Bottom */}
+      {}
       <div className="flex items-center gap-2 mt-auto pt-3 border-t border-white/5">
         <span
           className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"

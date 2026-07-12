@@ -30,7 +30,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
     if (initialConvId && open) {
       let conv = localConvs.find((c) => c.id === initialConvId) || null
       if (!conv && initialConvId.includes('_')) {
-        // Create a temporary conversation object
+        
         conv = {
           id: initialConvId,
           userName: 'Problem Submitter',
@@ -92,7 +92,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
 
     const [clusterId, otherUserId] = activeConv.id.split('_')
     
-    // Create optimistic message
+    
     const tempId = 'temp_' + Date.now();
     const optimisticMsg: DevMessage = {
       id: tempId,
@@ -121,7 +121,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
         content: contentToSend,
       })
 
-      // Replace optimistic message with real message
+      
       setActiveConv((prev) => {
         if (!prev) return null
         return {
@@ -147,7 +147,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
     } catch (err: unknown) {
       console.error('Failed to send message:', err)
       
-      // Remove optimistic message if failed
+      
       setActiveConv((prev) => {
         if (!prev) return null
         return {
@@ -176,7 +176,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
       <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
       <div className="fixed right-0 top-0 h-full w-full sm:w-[380px] bg-[#0D0D15] border-l border-white/10 z-50 flex flex-col">
 
-        {/* Header */}
+        {}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/5">
           {activeConv && (
             <button onClick={() => setActiveConv(null)} className="text-slate-500 hover:text-slate-300 transition-colors">
@@ -198,7 +198,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
           </button>
         </div>
 
-        {/* Conversation list */}
+        {}
         {!activeConv && (
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             {localConvs.length === 0 ? (
@@ -235,7 +235,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
           </div>
         )}
 
-        {/* Chat thread */}
+        {}
         {activeConv && (
           <>
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-hide">
@@ -263,10 +263,10 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Premium Message Input */}
+            {}
             <div className="px-4 py-4 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F] to-transparent z-10 pt-8 pb-6">
               <div className="relative group">
-                {/* Glow effect */}
+                {}
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-[24px] blur opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
                 
                 <div className="relative flex items-end gap-2 bg-[#12121A] border border-white/10 focus-within:border-indigo-500/50 rounded-[24px] px-4 py-2.5 transition-all shadow-lg">
