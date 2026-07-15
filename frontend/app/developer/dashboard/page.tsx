@@ -529,9 +529,7 @@ function DeveloperDashboardContent() {
         conversations={conversations}
         open={chatOpen}
         onClose={() => closeChat()}
-        onRead={(convId) => setConversations((prev) =>
-          prev.map((c) => (c.id === convId ? { ...c, unreadCount: 0 } : c))
-        )}
+
         initialConvId={activeChatConvId}
       />
     </div>
