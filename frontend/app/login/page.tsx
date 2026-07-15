@@ -101,17 +101,7 @@ export default function LoginPage() {
     }
   }
 
-  const autofill = (userType: 'user' | 'developer') => {
-    if (userType === 'user') {
-      setEmail('user@needstack.com')
-      setPassword('user123')
-      setSelectedRole('user')
-    } else {
-      setEmail('dev@needstack.com')
-      setPassword('dev123')
-      setSelectedRole('developer')
-    }
-  }
+
 
   const currentRole = roles.find((r) => r.key === selectedRole)!
 

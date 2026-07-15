@@ -17,8 +17,8 @@ interface UserFeedItem {
 function UserFeedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
+  const [isAuthenticated] = useState(false);
+  const [userEmail] = useState("");
   
   // Feed list and submission states
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(true);
@@ -66,6 +66,7 @@ function UserFeedContent() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isAuthenticated) {
       setTimeout(() => fetchFeed(activeFilter), 0);

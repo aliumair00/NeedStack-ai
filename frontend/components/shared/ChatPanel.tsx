@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { X, Send, ArrowLeft, Check, CheckCheck } from 'lucide-react'
+import { X, Send, ArrowLeft, CheckCheck } from 'lucide-react'
 import { Conversation, Message } from '@/lib/mockData'
 import { api } from '@/lib/api'
 
@@ -20,6 +20,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const activeConvIdRef = useRef<string | null>(null)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     activeConvIdRef.current = activeConv?.id || null
   }, [activeConv?.id])
@@ -33,7 +34,6 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
       let conv = localConvs.find((c) => c.id === initialConvId) || null
       if (!conv && initialConvId.includes('_')) {
         
-        const [clusterId, otherUserId] = initialConvId.split('_')
         conv = {
           id: initialConvId,
           developerName: 'Developer',
@@ -53,6 +53,7 @@ export default function ChatPanel({ conversations, open, onClose, onRead, initia
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeConv?.messages?.length])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeConv && open) {
       const fetchMessages = async () => {

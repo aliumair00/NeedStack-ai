@@ -3,10 +3,9 @@
 import { useState, useMemo, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
-  LayoutDashboard, Users, Code2, Layers,
-  BarChart2, Settings, LogOut, Shield,
-  MoreVertical, CheckCircle, XCircle, Clock, Trash2, 
-  ExternalLink, Search, Star, StarOff, AlertTriangle, Menu,
+  Users, Code2, Layers,
+  CheckCircle, Clock, Trash2, 
+  Search, Star, StarOff, AlertTriangle, Menu,
   ShieldOff, ShieldCheck, TrendingUp, Activity, Loader2
 } from 'lucide-react'
 import AdminSidebar from '@/components/admin/AdminSidebar'

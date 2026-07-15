@@ -12,10 +12,9 @@ interface DevChatPanelProps {
   onClose: () => void
   initialConvId?: string | null
   onMessageSent?: (convId: string) => void
-  onRead?: (convId: string) => void
 }
 
-export default function DevChatPanel({ conversations, open, onClose, initialConvId, onMessageSent, onRead }: DevChatPanelProps) {
+export default function DevChatPanel({ conversations, open, onClose, initialConvId, onMessageSent }: DevChatPanelProps) {
   const router = useRouter()
   const [activeConv, setActiveConv] = useState<DevConversation | null>(null)
   const [message, setMessage] = useState('')
@@ -50,6 +49,7 @@ export default function DevChatPanel({ conversations, open, onClose, initialConv
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeConv?.messages?.length])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeConv && open) {
       const fetchMessages = async () => {

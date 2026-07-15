@@ -10,7 +10,7 @@ function UserSettingsContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState('Ali Hassan')
   const [userEmail, setUserEmail] = useState('user@needstack.com')
-  const [unreadMessages, setUnreadMessages] = useState(0) 
+  const [unreadMessages] = useState(0)
 
   
   const [nameInput, setNameInput] = useState('')

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { 
-  Flame, Clock, TrendingUp, CheckCircle, 
+  Clock, TrendingUp, CheckCircle, 
   MessageSquare, Loader2, Menu,
   ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react'
@@ -31,7 +31,7 @@ function UserDashboardContent() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userName, setUserName] = useState('Ali Hassan')
-  const [userEmail, setUserEmail] = useState('user@needstack.com')
+
 
   const [problems, setProblems] = useState<UserProblem[]>([])
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -106,7 +106,6 @@ function UserDashboardContent() {
     setTimeout(() => {
       setIsAuthenticated(true)
       if (email) {
-      setUserEmail(email)
       const prefix = email.split('@')[0]
       const formattedName = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace('.', ' ')
       setUserName(formattedName || 'Ali Hassan')
@@ -130,7 +129,7 @@ useEffect(() => {
   }, [currentTab])
 
   const unreadMessages = conversations.reduce((acc, c) => acc + c.unreadCount, 0)
-  const unreadNotifs = notifications.filter((n) => !n.isRead).length
+
 
   const handleSubmit = async () => {
     if (problemText.trim().length < 10) return
