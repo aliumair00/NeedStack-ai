@@ -79,7 +79,7 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http:
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002';
       const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
